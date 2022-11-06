@@ -15,10 +15,10 @@ class UserSerializer(serializers.ModelSerializer):
         new_user = User.objects.create(username=validated_data['username'])
         new_user.set_password(validated_data['password'])
         new_user.save()
-        if validated_data['is_hotel_owner']:
+        if validated_data['is_doctor']:
             new_doctor = Doctor.objects.create(user=new_user)
             new_doctor.save()
-        elif validated_data['is_doctor']:
+        elif validated_data['is_hotel_owner']:
             new_hotel_owner = HotelOwner.objects.create(user=new_user)
             new_hotel_owner.save()
         return new_user
