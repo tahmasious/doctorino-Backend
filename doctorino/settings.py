@@ -40,8 +40,11 @@ INSTALLED_APPS = [
     'web',
     'rest_framework',
     # 'rest_framework.authtoken',
-    'authentication'
+    'authentication.apps.AuthConfig',
+    'doctor_management.apps.DoctorManagementConfig',
+
 ]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
