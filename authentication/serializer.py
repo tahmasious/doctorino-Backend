@@ -1,7 +1,8 @@
 from pprint import pprint
 
 from rest_framework import serializers
-from .models import User, Doctor, HotelOwner
+from .models import User, Doctor
+from hotel_management.models import Hotel
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,6 +20,6 @@ class UserSerializer(serializers.ModelSerializer):
             new_doctor = Doctor.objects.create(user=new_user)
             new_doctor.save()
         elif validated_data['is_hotel_owner']:
-            new_hotel_owner = HotelOwner.objects.create(user=new_user)
+            new_hotel_owner = Hotel.objects.create(user=new_user)
             new_hotel_owner.save()
         return new_user

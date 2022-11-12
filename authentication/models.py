@@ -8,11 +8,6 @@ class User(AbstractUser):
     is_doctor = models.BooleanField(default=False, blank=True, null=True)
 
 
-class HotelOwner(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='hotel_owner')
-    ownership_proof = models.FileField(upload_to='hotel-proof-of-ownership', null=True, blank=True)
-
-
 # class Hotel(models.Model):
 #     owner = models.ForeignKey(HotelOwner, on_delete=models.SET_NULL,related_name='hotel')
 #     name = models.CharField(max_length=256, null=True, blank=True)
