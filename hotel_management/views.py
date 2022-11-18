@@ -1,13 +1,12 @@
-
+from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from hotel_management.models import Hotel
-from hotel_management.serializer import HotelSerializer
+from hotel_management.models import Hotel, Room, RoomImage
+from hotel_management.serializer import HotelSerializer, RoomSerializer, HotelRoomImagesSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly
 
 
-class HotelViewSet(viewsets.ModelViewSet):
+class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
     permission_classes = []
@@ -18,3 +17,30 @@ class HotelViewSet(viewsets.ModelViewSet):
         else:
             return []
         return [permission() for permission in self.permission_classes]
+
+
+class HotelListCreateView(generics.ListCreateAPIView):
+    queryset = Hotel.objects.all()
+    serializer_class = HotelSerializer
+
+
+class RoomRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = RoomSerializer
+    queryset = Room.objects.all()
+
+
+class RoomListCreateView(generics.ListCreateAPIView):
+    serializer_class = RoomSerializer
+    queryset = Room.objects.all()
+
+
+class HotelRoomsListView(generics.ListAPIView):
+    serializer_class = RoomSerializer
+
+    def get_queryset(self):
+        return Room.objects.filter(hotel_id=self.kwargs["pk"])
+
+
+class HotelRoomImageCreateView(generics.CreateAPIView):
+    serializer_class = HotelRoomImagesSerializer
+    queryset = RoomImage.objects.all()
