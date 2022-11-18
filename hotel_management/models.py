@@ -14,3 +14,18 @@ class Hotel(models.Model):
 
     def __str__(self):
         return self.hotel_name
+
+
+class Room(models.Model):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1, blank=True)
+    bed_count = models.SmallIntegerField(default=1, blank=True)
+    price_per_night = models.PositiveIntegerField(null=True)
+
+
+class RoomImage(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='room-images', blank=True, null=True)
+    is_thumbnail = models.BooleanField(default=False, blank=True, null=True)
+    is_cover = models.BooleanField(default=False, blank=True, null=True)
+
