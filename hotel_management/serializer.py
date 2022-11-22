@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from hotel_management.models import Hotel, Room, RoomImage
+from hotel_management.models import Hotel, Room, RoomImage, Feature
 
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
@@ -16,6 +16,25 @@ class HotelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hotel
         fields = "__all__"
+
+
+class FeatureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feature
+        fields = "__all__"
+
+
+class HotelListSerializer(serializers.ModelSerializer):
+    features = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Hotel
+        exclude = ('ownership_proof', 'hotel_description', 'rules', 'hotel_owner')
+
+    def get_features(self, obj):
+        features = obj.features.all()
+        serializer = FeatureSerializer(features, many=True)
+        return serializer.data
 
 
 class HotelRoomImagesSerializer(serializers.ModelSerializer):
