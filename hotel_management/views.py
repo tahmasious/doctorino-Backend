@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import generics, status
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
@@ -34,11 +35,12 @@ class HotelListCreateViewSet(viewsets.ViewSet):
         serializer = HotelListSerializer(self.queryset, many=True)
         return Response(serializer.data)
 
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = HotelSerializer(data=request.data)
+        print(serializer.initial_data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
