@@ -6,7 +6,10 @@ class User(AbstractUser):
     username = models.CharField(max_length=120, unique=True, blank=False, null=True)
     is_hotel_owner = models.BooleanField(default=False, blank=True, null=True)
     is_doctor = models.BooleanField(default=False, blank=True, null=True)
+    email = models.EmailField(unique=True, blank=False)
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
 
 # class Hotel(models.Model):
 #     owner = models.ForeignKey(HotelOwner, on_delete=models.SET_NULL,related_name='hotel')
@@ -21,3 +24,4 @@ class Doctor(models.Model):
 
 class HotelOwner(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
+    test = models.CharField(max_length=256, null=True, blank=True)
