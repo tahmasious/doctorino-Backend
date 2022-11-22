@@ -1,8 +1,11 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from hotel_management.models import Hotel, Room, RoomImage
-from hotel_management.serializer import HotelSerializer, RoomSerializer, HotelRoomImagesSerializer
+from rest_framework.response import Response
+
+from hotel_management.models import Hotel, Room, RoomImage, Feature
+from hotel_management.serializer import HotelSerializer, RoomSerializer, HotelRoomImagesSerializer, HotelListSerializer, \
+    FeatureSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly
 
 
@@ -19,9 +22,24 @@ class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         return [permission() for permission in self.permission_classes]
 
 
-class HotelListCreateView(generics.ListCreateAPIView):
+class HotelListView(generics.ListAPIView):
+    queryset = Hotel.objects.filter(is_active=True)
+    serializer_class = HotelListSerializer
+
+
+class HotelListCreateViewSet(viewsets.ViewSet):
     queryset = Hotel.objects.all()
-    serializer_class = HotelSerializer
+
+    def list(self, request):
+        serializer = HotelListSerializer(self.queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        serializer = HotelSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        print(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class RoomRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -44,3 +62,8 @@ class HotelRoomsListView(generics.ListAPIView):
 class HotelRoomImageCreateView(generics.CreateAPIView):
     serializer_class = HotelRoomImagesSerializer
     queryset = RoomImage.objects.all()
+
+
+class FeatureListView(generics.ListAPIView):
+    serializer_class = FeatureSerializer
+    queryset = Feature.objects.all()
