@@ -16,13 +16,15 @@ class Doctor(models.Model):
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctor')
-    ownership_proof = models.FileField(upload_to='doctor-proof-of-being-doctor', null=True, blank=True)
+    license_proof = models.FileField(upload_to='doctor-proof-of-being-doctor', null=True, blank=True)
     medical_system_number = models.CharField(max_length=8, unique=True, blank=False, null=True)
     is_verifyed = models.BooleanField(default=False, blank=True, null=True)
     natinal_code = models.CharField(max_length=10, unique=True, blank=False, null=True)
     gender = models.IntegerField(choices=GENDER_CHOICES, default=2)
     specialties = models.ManyToManyField(Specialty)
+    province = models.CharField(max_length=50, unique=True, blank=False, null=True)
+    city = models.CharField(max_length=50, unique=True, blank=False, null=True)
     clinic_address = models.CharField(max_length=250, blank=True, null=False)
-
+    
     def __str__(self):
         return self.user.username
