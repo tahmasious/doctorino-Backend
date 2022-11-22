@@ -1,4 +1,7 @@
 from rest_framework import serializers
+
+from authentication.models import HotelOwner, User
+from authentication.serializer import UserSerializer
 from hotel_management.models import Hotel, Room, RoomImage, Feature
 
 
@@ -12,10 +15,37 @@ class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
         return {self.field_name: data}
 
 
+class HotelOwnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HotelOwner
+        fields = "__all__"
+
+
 class HotelSerializer(serializers.ModelSerializer):
+    hotel_owner = ReadWriteSerializerMethodField()
+    user = ReadWriteSerializerMethodField()
+
     class Meta:
         model = Hotel
-        fields = "__all__"
+        exclude = ('features',)
+
+    def get_hotel_owner(self, obj):
+        hotel_owner = obj.hotel_owner
+        return HotelOwnerSerializer(hotel_owner).data
+
+    def get_user(self, obj):
+        user = obj.hotel_owner.user
+        return UserSerializer(user).data
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        hotel_owner_data = validated_data.pop('hotel_owner')
+        user = User.objects.create(**user_data)
+        user.set_password(user_data['password'])
+        hotel_owner = HotelOwner.objects.create(user=user, **hotel_owner_data)
+        hotel = Hotel.objects.create(hotel_owner=hotel_owner, **validated_data)
+        hotel.save()
+        return hotel
 
 
 class FeatureSerializer(serializers.ModelSerializer):
@@ -29,7 +59,7 @@ class HotelListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Hotel
-        exclude = ('ownership_proof', 'hotel_description', 'rules', 'hotel_owner')
+        exclude = ('trade_code', 'hotel_description', 'rules', 'hotel_owner')
 
     def get_features(self, obj):
         features = obj.features.all()
