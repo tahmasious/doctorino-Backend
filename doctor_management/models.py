@@ -18,7 +18,7 @@ class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='doctor')
     license_proof = models.FileField(upload_to='doctor-proof-of-being-doctor', null=True, blank=True)
     medical_system_number = models.CharField(max_length=8, unique=True, blank=False, null=True)
-    is_verifyed = models.BooleanField(default=False, blank=True, null=True)
+    is_active = models.BooleanField(default=False, blank=True, null=True)
     natinal_code = models.CharField(max_length=10, unique=True, blank=False, null=True)
     gender = models.IntegerField(choices=GENDER_CHOICES, default=2)
     specialties = models.ManyToManyField(Specialty)
