@@ -17,3 +17,7 @@ class User(AbstractUser):
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='hospital_owner')
     ownership_proof = models.FileField(upload_to='hospital-proof-of-ownership', null=True, blank=True)
+
+
+class HotelOwner(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
