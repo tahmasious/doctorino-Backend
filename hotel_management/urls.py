@@ -2,15 +2,14 @@ from django.urls import path, include
 from rest_framework import routers
 
 from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView, RoomListCreateView, \
-    HotelRoomsListView, HotelRoomImageCreateView, HotelListCreateViewSet, FeatureListView
+    HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView
 
-router = routers.DefaultRouter()
-router.register(r'', HotelListCreateViewSet)
 
 urlpatterns = [
     # Hotel urls
     path('<int:pk>/', HotelRetrieveUpdateDestroyView.as_view()),
-    path('', include(router.urls)),
+    path('', HotelListView.as_view()),
+    path('new/', HotelCreateView.as_view()),
     path('<int:pk>/room/', HotelRoomsListView.as_view()),
 
     # Room urls
