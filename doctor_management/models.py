@@ -22,8 +22,8 @@ class Doctor(models.Model):
     national_code = models.CharField(max_length=10, unique=True, blank=False, null=True)
     gender = models.IntegerField(choices=GENDER_CHOICES, default=2)
     specialties = models.ManyToManyField(Specialty)
-    province = models.CharField(max_length=50, unique=True, blank=False, null=True)
-    city = models.CharField(max_length=50, unique=True, blank=False, null=True)
+    province = models.CharField(max_length=50, blank=False, null=True)
+    city = models.CharField(max_length=50, blank=False, null=True)
     clinic_address = models.CharField(max_length=250, blank=True, null=False)
     
     def __str__(self):
