@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Doctor, Specialty
-from authentication.serializers import UserSerializer
+from authentication.serializers import UserSerializer, UserListSerializer
+from authentication.models import User
 
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
@@ -19,23 +20,50 @@ class SpecialtySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class DoctorSerializer(serializers.ModelSerializer):
-    user = ReadWriteSerializerMethodField()
-    specialties = SpecialtySerializer()
+class DoctorDetailSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Doctor
-        fields = '__all__'
+        fields = "__all__"
 
     def get_user(self, obj):
         user = obj.user
-        return UserSerializer(user).data
+        return UserListSerializer(user).data
+
+
+class DoctorCreateSerializer(serializers.ModelSerializer):
+    user = ReadWriteSerializerMethodField()
+
+    class Meta:
+        model = Doctor
+        fields = (
+            "id", 
+            "user", 
+            "medical_system_number", 
+            "gender",
+            "specialties", 
+            "province", 
+            "city", 
+            "clinic_address"
+        )
+
+
+    def get_user(self, obj):
+        user = obj.user
+        return UserListSerializer(user).data
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        user = User.objects.create(**user_data)
-        user.set_password(user_data['password'])
+        specialty_list = validated_data.pop('specialties')
+
+        user_serialized = UserSerializer(data=user_data)
+        user_serialized.is_valid(raise_exception=True)
+        user = user_serialized.save()
+        
         doctor = Doctor.objects.create(user=user, **validated_data)
+        for spec in specialty_list:
+            doctor.specialties.add(spec)
         doctor.save()
         return doctor
 
@@ -45,9 +73,9 @@ class DoctorListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        exclude = ('license_proof', 'is_verifyed', 'national_code',)
+        exclude = ('license_proof', 'is_active', 'national_code',)
 
     def get_specialties(self, obj):
         specialties = obj.specialties.all()
-        serializer = FeatureSerializer(specialties, many=True)
+        serializer = SpecialtySerializer(specialties, many=True)
         return serializer.data

@@ -1,47 +1,31 @@
 from django.shortcuts import render
 from .models import Doctor, Specialty
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from .serializers import DoctorSerializer, SpecialtySerializer, DoctorListSerializer
+from .serializers import (DoctorDetailSerializer, DoctorListSerializer,
+                        DoctorCreateSerializer, SpecialtySerializer)
+
 from utils.permissions import IsDoctorOrReadOnly
 from django.db import transaction
-
-
-class DoctorViewSet(ModelViewSet):
-    queryset = Doctor.objects.all()
-    serializer_class = DoctorSerializer
-
-
-class SpecialtyView(generics.ListAPIView):
-    queryset = Specialty.objects.all()
-    serializer_class = SpecialtySerializer
+from rest_framework.response import Response
+from doctorino.pagination import StandardResultsSetPagination
 
 
 class DoctorListView(generics.ListAPIView):
     queryset = Doctor.objects.filter(is_active=True)
+    pagination_class = StandardResultsSetPagination
     serializer_class = DoctorListSerializer
 
 
-class DoctorListCreateViewSet(viewsets.ViewSet):
-    queryset = Doctor.objects.all()
-
-    def list(self, request):
-        serializer = DoctorListSerializer(self.queryset, many=True)
-        return Response(serializer.data)
-
-    @transaction.atomic
-    def create(self, request, *args, **kwargs):
-        serializer = DoctorSerializer(data=request.data)
-        print(serializer.initial_data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+class DoctorCreateView(generics.CreateAPIView):
+    queryset = Doctor.objects.filter(is_active=True)
+    serializer_class = DoctorCreateSerializer
 
 
 class DoctorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Doctor.objects.all()
-    serializer_class = DoctorSerializer
+    serializer_class = DoctorDetailSerializer
     permission_classes = []
 
     def get_permissions(self): # Retrieve and list don't need authentication, others need
@@ -52,6 +36,6 @@ class DoctorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         return [permission() for permission in self.permission_classes]
 
 
-class SpecialityListView(generics.ListAPIView):
+class SpecialtyListView(generics.ListAPIView):
     serializer_class = SpecialtySerializer
     queryset = Specialty.objects.all()
