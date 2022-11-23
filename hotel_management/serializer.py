@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from authentication.models import HotelOwner, User
-from authentication.serializer import UserSerializer, UserListSerializer
+from authentication.serializers import UserSerializer, UserListSerializer
 from hotel_management.models import Hotel, Room, RoomImage, Feature
 
 
