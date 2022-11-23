@@ -4,10 +4,12 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from authentication.models import HotelOwner
 from doctorino.pagination import StandardResultsSetPagination
 from hotel_management.models import Hotel, Room, RoomImage, Feature
-from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, HotelListSerializer, \
-    FeatureSerializer, HotelDetailSerializer
+from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
+    HotelListSerializer, \
+    FeatureSerializer, HotelDetailSerializer, HotelOwnerSerializer, HotelOwnerUpdateRetrieveSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly
 
 
@@ -38,7 +40,14 @@ class HotelCreateView(generics.CreateAPIView):
 class RoomRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RoomSerializer
     queryset = Room.objects.all()
+    permission_classes = []
 
+    def get_permissions(self): # Retrieve and list don't need authentication, others need
+        if self.request.method != "GET":
+            return [IsAuthenticated(), IsHotelOwnerOrReadOnly()]
+        else:
+            return []
+        return [permission() for permission in self.permission_classes]
 
 class RoomListCreateView(generics.ListCreateAPIView):
     serializer_class = RoomSerializer
@@ -60,3 +69,9 @@ class HotelRoomImageCreateView(generics.CreateAPIView):
 class FeatureListView(generics.ListAPIView):
     serializer_class = FeatureSerializer
     queryset = Feature.objects.all()
+
+
+class HotelOwnerUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = HotelOwner.objects.all()
+    serializer_class = HotelOwnerUpdateRetrieveSerializer
+
