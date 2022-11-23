@@ -1,6 +1,6 @@
 from rest_framework import generics
 from rest_framework import viewsets
-from authentication.models import User
+from authentication.models import User, HotelOwner
 from hotel_management.models import Hotel
 from authentication.serializer import UserSerializer
 
