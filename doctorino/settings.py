@@ -40,9 +40,7 @@ INSTALLED_APPS = [
     'web',
     'rest_framework',
     # 'rest_framework.authtoken',
-    'authentication.apps.AuthConfig',
     'doctor_management.apps.DoctorManagementConfig',
-
     'hotel_management',
     'authentication'
 ]
