@@ -24,7 +24,7 @@ class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class HotelListCreateViewSet(viewsets.ViewSet):
-    queryset = Hotel.objects.all()
+    queryset = Hotel.objects.filter(is_active=True)
 
     def list(self, request):
         serializer = HotelListSerializer(self.queryset, many=True)
