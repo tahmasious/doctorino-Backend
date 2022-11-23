@@ -27,3 +27,9 @@ class UserSerializer(serializers.ModelSerializer):
             new_hotel_owner = HotelOwner.objects.create(user=new_user)
             new_hotel_owner.save()
         return new_user
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "username", "id", "email")
