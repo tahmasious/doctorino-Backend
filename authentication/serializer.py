@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def create(self, validated_data):
-        new_user = User.objects.create(username=validated_data['username'])
+        new_user = User.objects.create(email=validated_data['email'])
         new_user.set_password(validated_data['password'])
         new_user.save()
         return new_user
