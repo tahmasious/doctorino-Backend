@@ -1,8 +1,7 @@
 from pprint import pprint
 
 from rest_framework import serializers
-from .models import User, Doctor
-from hotel_management.models import Hotel
+from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
