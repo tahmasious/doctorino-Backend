@@ -11,11 +11,6 @@ class User(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
-# class Hotel(models.Model):
-#     owner = models.ForeignKey(HotelOwner, on_delete=models.SET_NULL,related_name='hotel')
-#     name = models.CharField(max_length=256, null=True, blank=True)
-#     star = models.SmallIntegerField()
-
 
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='hospital_owner')
