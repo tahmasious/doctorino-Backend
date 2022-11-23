@@ -4,15 +4,16 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from doctorino.pagination import StandardResultsSetPagination
 from hotel_management.models import Hotel, Room, RoomImage, Feature
-from hotel_management.serializer import HotelSerializer, RoomSerializer, HotelRoomImagesSerializer, HotelListSerializer, \
-    FeatureSerializer
+from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, HotelListSerializer, \
+    FeatureSerializer, HotelDetailSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly
 
 
 class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Hotel.objects.all()
-    serializer_class = HotelSerializer
+    serializer_class = HotelDetailSerializer
     permission_classes = []
 
     def get_permissions(self): # Retrieve and list don't need authentication, others need
@@ -23,20 +24,15 @@ class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         return [permission() for permission in self.permission_classes]
 
 
-class HotelListCreateViewSet(viewsets.ViewSet):
+class HotelListView(generics.ListAPIView):
     queryset = Hotel.objects.filter(is_active=True)
+    pagination_class = StandardResultsSetPagination
+    serializer_class = HotelListSerializer
 
-    def list(self, request):
-        serializer = HotelListSerializer(self.queryset, many=True)
-        return Response(serializer.data)
 
-    @transaction.atomic
-    def create(self, request, *args, **kwargs):
-        serializer = HotelSerializer(data=request.data)
-        print(serializer.initial_data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+class HotelCreateView(generics.CreateAPIView):
+    queryset = Hotel.objects.filter(is_active=True)
+    serializer_class = HotelCreateSerializer
 
 
 class RoomRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
