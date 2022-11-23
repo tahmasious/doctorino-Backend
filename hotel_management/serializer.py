@@ -139,3 +139,23 @@ class RoomSerializer(serializers.ModelSerializer):
                                          is_cover=image['is_cover']).save()
 
         return new_room
+
+
+class HotelOwnerUpdateRetrieveSerializer(serializers.ModelSerializer):
+    user = ReadWriteSerializerMethodField()
+
+    class Meta:
+        model = HotelOwner
+        fields = "__all__"
+
+    def get_user(self, obj):
+        return UserSerializer(obj.user).data
+
+    def update(self, instance: HotelOwner, validated_data):
+        if 'user' in validated_data:
+            user_data = validated_data.pop('user')
+            user = instance.user
+            UserSerializer().update(user, user_data)
+            User.objects.filter(id=instance.user.id).update(**user_data)
+        return super(HotelOwnerUpdateRetrieveSerializer, self).update(instance, validated_data)
+
