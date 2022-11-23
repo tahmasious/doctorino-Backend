@@ -23,11 +23,6 @@ class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         return [permission() for permission in self.permission_classes]
 
 
-class HotelListView(generics.ListAPIView):
-    queryset = Hotel.objects.filter(is_active=True)
-    serializer_class = HotelListSerializer
-
-
 class HotelListCreateViewSet(viewsets.ViewSet):
     queryset = Hotel.objects.all()
 
