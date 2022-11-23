@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from authentication.models import HotelOwner, User
-from authentication.serializer import UserSerializer
+from authentication.serializer import UserSerializer, UserListSerializer
 from hotel_management.models import Hotel, Room, RoomImage, Feature
 
 
@@ -21,13 +21,13 @@ class HotelOwnerSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class HotelSerializer(serializers.ModelSerializer):
-    hotel_owner = ReadWriteSerializerMethodField()
-    user = ReadWriteSerializerMethodField()
+class HotelDetailSerializer(serializers.ModelSerializer):
+    hotel_owner = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
-        exclude = ('features',)
+        fields = "__all__"
 
     def get_hotel_owner(self, obj):
         hotel_owner = obj.hotel_owner
@@ -35,15 +35,39 @@ class HotelSerializer(serializers.ModelSerializer):
 
     def get_user(self, obj):
         user = obj.hotel_owner.user
-        return UserSerializer(user).data
+        return UserListSerializer(user).data
+
+
+class HotelCreateSerializer(serializers.ModelSerializer):
+    hotel_owner = ReadWriteSerializerMethodField()
+    user = ReadWriteSerializerMethodField()
+
+    class Meta:
+        model = Hotel
+        fields = ("id", "hotel_owner", "user", "hotel_name", "hotel_stars", "address", "features")
+
+
+    def get_hotel_owner(self, obj):
+        hotel_owner = obj.hotel_owner
+        return HotelOwnerSerializer(hotel_owner).data
+
+    def get_user(self, obj):
+        user = obj.hotel_owner.user
+        return UserListSerializer(user).data
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
+        feature_list = validated_data.pop('features')
         hotel_owner_data = validated_data.pop('hotel_owner')
-        user = User.objects.create(**user_data)
-        user.set_password(user_data['password'])
+
+        user_serialized = UserSerializer(data=user_data)
+        user_serialized.is_valid()
+        user = user_serialized.save()
+
         hotel_owner = HotelOwner.objects.create(user=user, **hotel_owner_data)
         hotel = Hotel.objects.create(hotel_owner=hotel_owner, **validated_data)
+        for feature in feature_list:
+            hotel.features.add(feature)
         hotel.save()
         return hotel
 
