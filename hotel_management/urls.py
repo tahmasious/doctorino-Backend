@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView, RoomListCreateView, \
-    HotelListView, HotelRoomsListView, HotelRoomImageCreateView, HotelListCreateViewSet, FeatureListView
+    HotelRoomsListView, HotelRoomImageCreateView, HotelListCreateViewSet, FeatureListView
 
 router = routers.DefaultRouter()
 router.register(r'', HotelListCreateViewSet)
