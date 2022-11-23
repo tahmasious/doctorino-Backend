@@ -7,5 +7,5 @@ from authentication.views import UserCreationView
 urlpatterns = [
     path('token/', jwt_views.TokenObtainPairView.as_view()),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view()),
-    path('new-user/', UserCreationView.as_view())
+    path('new-user/', UserCreationView.as_view()),
 ]
