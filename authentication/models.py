@@ -24,4 +24,4 @@ class Doctor(models.Model):
 
 class HotelOwner(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
-    test = models.CharField(max_length=256, null=True, blank=True)
+    shaba_code = models.CharField(max_length=256, null=True, blank=True)
