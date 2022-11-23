@@ -39,9 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'web',
     'rest_framework',
+    # 'rest_framework.authtoken',
+    'authentication.apps.AuthConfig',
+    'doctor_management.apps.DoctorManagementConfig',
+
     'hotel_management',
     'authentication'
 ]
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',

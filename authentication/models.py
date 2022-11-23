@@ -12,11 +12,6 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
 
-class Doctor(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='hospital_owner')
-    ownership_proof = models.FileField(upload_to='doctor-proof-of-being-doctor', null=True, blank=True)
-
-
 class HotelOwner(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
     shaba_code = models.CharField(max_length=256, null=True, blank=True)
