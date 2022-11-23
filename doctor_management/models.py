@@ -27,4 +27,4 @@ class Doctor(models.Model):
     clinic_address = models.CharField(max_length=250, blank=True, null=False)
     
     def __str__(self):
-        return self.user.username
+        return self.user.first_name + " " + self.user.last_name
