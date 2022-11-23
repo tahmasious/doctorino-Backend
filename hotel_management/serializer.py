@@ -61,7 +61,7 @@ class HotelCreateSerializer(serializers.ModelSerializer):
         hotel_owner_data = validated_data.pop('hotel_owner')
 
         user_serialized = UserSerializer(data=user_data)
-        user_serialized.is_valid()
+        user_serialized.is_valid(raise_exception=True)
         user = user_serialized.save()
 
         hotel_owner = HotelOwner.objects.create(user=user, **hotel_owner_data)
