@@ -45,7 +45,7 @@ class DoctorListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Doctor
-        exclude = ('license_proof', 'is_verifyed', 'natinal_code',)
+        exclude = ('license_proof', 'is_verifyed', 'national_code',)
 
     def get_specialties(self, obj):
         specialties = obj.specialties.all()

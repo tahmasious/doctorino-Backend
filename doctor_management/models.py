@@ -19,7 +19,7 @@ class Doctor(models.Model):
     license_proof = models.FileField(upload_to='doctor-proof-of-being-doctor', null=True, blank=True)
     medical_system_number = models.CharField(max_length=8, unique=True, blank=False, null=True)
     is_active = models.BooleanField(default=False, blank=True, null=True)
-    natinal_code = models.CharField(max_length=10, unique=True, blank=False, null=True)
+    national_code = models.CharField(max_length=10, unique=True, blank=False, null=True)
     gender = models.IntegerField(choices=GENDER_CHOICES, default=2)
     specialties = models.ManyToManyField(Specialty)
     province = models.CharField(max_length=50, unique=True, blank=False, null=True)
