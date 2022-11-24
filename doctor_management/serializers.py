@@ -22,7 +22,8 @@ class SpecialtySerializer(serializers.ModelSerializer):
 
 class DoctorDetailSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
-
+    specialties = serializers.SerializerMethodField()
+    
     class Meta:
         model = Doctor
         fields = "__all__"
@@ -30,6 +31,11 @@ class DoctorDetailSerializer(serializers.ModelSerializer):
     def get_user(self, obj):
         user = obj.user
         return UserListSerializer(user).data
+
+    def get_specialties(self, obj):
+        specialties = obj.specialties.all()
+        serializer = SpecialtySerializer(specialties, many=True)
+        return serializer.data
 
 
 class DoctorCreateSerializer(serializers.ModelSerializer):
