@@ -24,7 +24,8 @@ class Doctor(models.Model):
     specialties = models.ManyToManyField(Specialty)
     province = models.CharField(max_length=50, blank=False, null=True)
     city = models.CharField(max_length=50, blank=False, null=True)
-    clinic_address = models.CharField(max_length=250, blank=True, null=False)
-    
+    clinic_address = models.CharField(max_length=250, blank=True, null=True)
+    image = models.ImageField(upload_to='doctor-image', blank=True, null=True)
+
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name
