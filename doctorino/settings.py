@@ -25,8 +25,8 @@ SECRET_KEY = 'django-insecure-$s$98x$vhgyzj$%@129w=7&br+4^e*e-e59sdcaczme*lvs3os
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ["*"]
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'web',
     'rest_framework',
+    'corsheaders',
     # 'rest_framework.authtoken',
     'doctor_management.apps.DoctorManagementConfig',
     'hotel_management',
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'doctorino.urls'
