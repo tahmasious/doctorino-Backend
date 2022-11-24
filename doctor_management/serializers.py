@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Doctor, Specialty
-from authentication.serializers import UserSerializer, UserListSerializer
+from authentication.serializers import UserSerializer, UserListSerializer, UserCommonInfoSerializer
 from authentication.models import User
 
 
@@ -70,7 +70,8 @@ class DoctorCreateSerializer(serializers.ModelSerializer):
 
 class DoctorListSerializer(serializers.ModelSerializer):
     specialties = serializers.SerializerMethodField()
-
+    user = UserCommonInfoSerializer()
+    
     class Meta:
         model = Doctor
         exclude = ('license_proof', 'is_active', 'national_code',)
