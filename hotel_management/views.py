@@ -35,6 +35,7 @@ class HotelListView(generics.ListAPIView):
 class HotelCreateView(generics.CreateAPIView):
     queryset = Hotel.objects.filter(is_active=True)
     serializer_class = HotelCreateSerializer
+    authentication_classes = []
 
 
 class RoomRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
