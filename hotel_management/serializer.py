@@ -57,7 +57,6 @@ class HotelCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        feature_list = validated_data.pop('features')
         hotel_owner_data = validated_data.pop('hotel_owner')
 
         user_serialized = UserSerializer(data=user_data)
@@ -66,8 +65,12 @@ class HotelCreateSerializer(serializers.ModelSerializer):
 
         hotel_owner = HotelOwner.objects.create(user=user, **hotel_owner_data)
         hotel = Hotel.objects.create(hotel_owner=hotel_owner, **validated_data)
-        for feature in feature_list:
-            hotel.features.add(feature)
+        
+        if 'features' in validated_data.keys():
+            feature_list = validated_data.pop('features')
+            for feature in feature_list:
+                hotel.features.add(feature)
+        
         hotel.save()
         return hotel
 
