@@ -9,7 +9,7 @@ from doctorino.pagination import StandardResultsSetPagination
 from hotel_management.models import Hotel, Room, RoomImage, Feature
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
-    FeatureSerializer, HotelDetailSerializer, HotelOwnerSerializer, HotelOwnerUpdateRetrieveSerializer
+    FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly
 
 
@@ -76,3 +76,7 @@ class HotelOwnerUpdateView(generics.RetrieveUpdateAPIView):
     queryset = HotelOwner.objects.all()
     serializer_class = HotelOwnerUpdateRetrieveSerializer
 
+
+class HotelOwnerCreateView(generics.CreateAPIView):
+    queryset = HotelOwner.objects.all()
+    serializer_class = HotelOwnerCreateSerializer
