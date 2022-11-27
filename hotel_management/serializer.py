@@ -21,6 +21,26 @@ class HotelOwnerSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class HotelOwnerCreateSerializer(serializers.ModelSerializer):
+    user = ReadWriteSerializerMethodField()
+
+    class Meta:
+        model = HotelOwner
+        fields = "__all__"
+
+    def get_user(self, obj):
+        user = obj.user
+        return UserSerializer(user).data
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user_serialized = UserSerializer(data=user_data)
+        user_serialized.is_valid(raise_exception=True)
+        user = user_serialized.save()
+        hotel_owner = HotelOwner.objects.create(user=user, **validated_data)
+        return hotel_owner
+
+
 class HotelDetailSerializer(serializers.ModelSerializer):
     hotel_owner = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
@@ -40,7 +60,7 @@ class HotelDetailSerializer(serializers.ModelSerializer):
 
 class HotelCreateSerializer(serializers.ModelSerializer):
     hotel_owner = ReadWriteSerializerMethodField()
-    user = ReadWriteSerializerMethodField()
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
@@ -55,22 +75,21 @@ class HotelCreateSerializer(serializers.ModelSerializer):
         user = obj.hotel_owner.user
         return UserListSerializer(user).data
 
+    def validate(self, attrs):
+        errs = dict()
+        data = super().validate(attrs)
+        if not HotelOwner.objects.filter(id=data['hotel_owner']).exists():
+            errs['hotel_owner'] = ["هیچ صاحب هتلی با این pk یافت نشد!"]
+        if errs:
+            raise serializers.ValidationError(errs)
+        return data
+
     def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        hotel_owner_data = validated_data.pop('hotel_owner')
-
-        user_serialized = UserSerializer(data=user_data)
-        user_serialized.is_valid(raise_exception=True)
-        user = user_serialized.save()
-
-        hotel_owner = HotelOwner.objects.create(user=user, **hotel_owner_data)
-        hotel = Hotel.objects.create(hotel_owner=hotel_owner, **validated_data)
-        
         if 'features' in validated_data.keys():
             feature_list = validated_data.pop('features')
-            for feature in feature_list:
-                hotel.features.add(feature)
-        
+        hotel = Hotel.objects.create(hotel_owner_id=validated_data.pop('hotel_owner'), **validated_data)
+        for feature in feature_list:
+            hotel.features.add(feature)
         hotel.save()
         return hotel
 
@@ -152,7 +171,7 @@ class HotelOwnerUpdateRetrieveSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_user(self, obj):
-        return UserSerializer(obj.user).data
+        return UserListSerializer(obj.user).data
 
     def update(self, instance: HotelOwner, validated_data):
         if 'user' in validated_data:
