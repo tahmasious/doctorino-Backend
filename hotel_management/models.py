@@ -12,7 +12,7 @@ class Feature(models.Model):
 
 
 class Hotel(models.Model):
-    hotel_owner = models.OneToOneField(HotelOwner, on_delete=models.CASCADE, related_name='hotel')
+    hotel_owner = models.ForeignKey(HotelOwner, on_delete=models.CASCADE, related_name='hotel')
     trade_code = models.CharField(max_length=256, null=True, blank=True)
     hotel_name = models.CharField(max_length=256, null=True)
     hotel_stars = models.SmallIntegerField(null=True)
