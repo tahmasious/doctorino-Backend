@@ -2,6 +2,8 @@ from django.db import models
 from authentication.models import User, HotelOwner
 
 
+def get_default_hotel_image_cover():
+    return 'hotel-images/default_hotel_image.jpg'
 class Feature(models.Model):
     title = models.CharField(max_length=256, null=True)
 
@@ -16,6 +18,7 @@ class Hotel(models.Model):
     hotel_stars = models.SmallIntegerField(null=True)
     hotel_description = models.CharField(max_length=1024, blank=True, null=True)
     address = models.CharField(max_length=256, null=True)
+    cover_image = models.ImageField(upload_to='hotel-images', null=True, blank=True, default=get_default_hotel_image_cover)
     rules = models.CharField(max_length=256, blank=True, null=True)
     is_active = models.BooleanField(default=False)
     features = models.ManyToManyField(Feature, related_name="features", blank=True, null=True)
