@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework import routers
 
 from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView, RoomListCreateView, \
-    HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView, HotelOwnerUpdateView
+    HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView, HotelOwnerUpdateView, \
+    HotelOwnerCreateView
 
 urlpatterns = [
     # Hotel urls
@@ -19,7 +20,8 @@ urlpatterns = [
     # Features urls
     path('feature/', FeatureListView.as_view()),
 
-    # owner update
-    path('owner/<int:pk>/', HotelOwnerUpdateView.as_view()),
+    # owner urls
+    path('owner/<int:pk>/', HotelOwnerUpdateView.as_view()),          # update and retrieve
+    path('owner/new/', HotelOwnerCreateView.as_view()),               # create new hotel owner
 ]
 
