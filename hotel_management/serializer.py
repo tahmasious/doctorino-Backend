@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from rest_framework import serializers
 
 from authentication.models import HotelOwner, User
@@ -59,13 +61,12 @@ class HotelDetailSerializer(serializers.ModelSerializer):
 
 
 class HotelCreateSerializer(serializers.ModelSerializer):
-    hotel_owner = ReadWriteSerializerMethodField()
+    hotel_owner = ReadWriteSerializerMethodField(required=False)
     user = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
         fields = ("id", "hotel_owner", "cover_image", "user", "hotel_name", "hotel_stars", "address", "features")
-
 
     def get_hotel_owner(self, obj):
         hotel_owner = obj.hotel_owner
@@ -78,18 +79,33 @@ class HotelCreateSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         errs = dict()
         data = super().validate(attrs)
-        if not HotelOwner.objects.filter(id=data['hotel_owner']).exists():
-            errs['hotel_owner'] = ["هیچ صاحب هتلی با این pk یافت نشد!"]
+        if 'hotel_owner' in data:
+            if not HotelOwner.objects.filter(id=data['hotel_owner']).exists():
+                errs['hotel_owner'] = ["هیچ صاحب هتلی با این pk یافت نشد!"]
+        else:
+            if not self.context['request'].user.is_hotel_owner and not self.context['request'].user.is_superuser:
+                errs['hotel_owner'] = ['شما دسترسی ساخت هتل ندارید !']
+            else:
+                user_id = self.context['request'].user.id
+                if not HotelOwner.objects.filter(user_id=user_id).exists():
+                    errs['hotel_owner'] = ['حساب خام شما ساخته شده اما حساب مدیریت هتل شما ساخته نشده است !']
         if errs:
             raise serializers.ValidationError(errs)
         return data
 
     def create(self, validated_data):
+        if 'hotel_owner' in validated_data :
+            hotel_owner_id = validated_data['hotel_owner']
+        else:
+            user_id = self.context['request'].user.id
+            hotel_owner_id = HotelOwner.objects.filter(user_id=user_id).last().id
+
         if 'features' in validated_data.keys():
             feature_list = validated_data.pop('features')
-        hotel = Hotel.objects.create(hotel_owner_id=validated_data.pop('hotel_owner'), **validated_data)
-        for feature in feature_list:
-            hotel.features.add(feature)
+        hotel = Hotel.objects.create(hotel_owner_id=hotel_owner_id, **validated_data)
+        if 'features' in validated_data.keys():
+            for feature in feature_list:
+                hotel.features.add(feature)
         hotel.save()
         return hotel
 
@@ -141,7 +157,6 @@ class RoomSerializer(serializers.ModelSerializer):
         return serialized_images.data
 
     def create(self, validated_data):
-        print(validated_data)
         if validated_data['hotel']:
             hotel = validated_data['hotel']
         else:
