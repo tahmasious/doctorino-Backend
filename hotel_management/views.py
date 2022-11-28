@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework import generics, status
 from rest_framework import viewsets
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -80,3 +81,14 @@ class HotelOwnerCreateView(generics.CreateAPIView):
     queryset = HotelOwner.objects.all()
     serializer_class = HotelOwnerCreateSerializer
     permission_classes = []
+
+
+class HotelOwnerHotelsListView(generics.ListAPIView):
+    serializer_class = HotelListSerializer
+
+    def get_queryset(self):
+        if not self.request.user.is_hotel_owner or not self.request.user.is_superuser :
+            context = {'user' : ['شما دسترسی برای دیدن هتل ها ندارید !']}
+            raise ValidationError(detail=context)
+        hotel_owner_id = self.request.user.owner.filter().last().id
+        return Hotel.objects.filter(hotel_owner_id=hotel_owner_id)
