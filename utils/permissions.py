@@ -14,7 +14,7 @@ class IsHotelOwnerOrReadOnly(permissions.BasePermission):
             return True
 
         # Instance must have an attribute named `owner`.
-        return obj.hotel_owner == request.user
+        return obj.hotel_owner.user == request.user
 
 class IsDoctorOrReadOnly(permissions.BasePermission):
     """
