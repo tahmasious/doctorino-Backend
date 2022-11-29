@@ -26,4 +26,4 @@ class UserListSerializer(serializers.ModelSerializer):
 class UserCommonInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("first_name", "last_name")
+        fields = ("id", "first_name", "last_name")
