@@ -36,6 +36,7 @@ class HotelListView(generics.ListAPIView):
 class HotelCreateView(generics.CreateAPIView):
     queryset = Hotel.objects.filter(is_active=True)
     serializer_class = HotelCreateSerializer
+    permission_classes = [IsAuthenticated,]
 
 
 class RoomRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -87,7 +88,7 @@ class HotelOwnerHotelsListView(generics.ListAPIView):
     serializer_class = HotelListSerializer
 
     def get_queryset(self):
-        if not self.request.user.is_hotel_owner or not self.request.user.is_superuser :
+        if not (self.request.user.is_hotel_owner or self.request.user.is_superuser) :
             context = {'user' : ['شما دسترسی برای دیدن هتل ها ندارید !']}
             raise ValidationError(detail=context)
         hotel_owner_id = self.request.user.owner.filter().last().id
