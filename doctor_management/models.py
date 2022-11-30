@@ -1,6 +1,7 @@
 from django.db import models
 from authentication.models import User
-# Create your models here.
+from django.contrib.gis.db import models as lcmodels
+from django.contrib.gis.geos import Point
 
 class Specialty(models.Model):
     name = models.CharField(max_length=250, unique=True, blank=False, null=False)
@@ -29,6 +30,7 @@ class Doctor(models.Model):
     phone_number = models.CharField(max_length=11, blank=False, null=True)
     office_number = models.CharField(max_length=11, blank=False, null=True)
     education = models.CharField(max_length=50, blank=False, null=True)
+    location = lcmodels.PointField(geography=True, default=Point(0.0, 0.0))
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name

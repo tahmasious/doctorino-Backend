@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'web',
     'rest_framework',
     'corsheaders',
-    # 'rest_framework.authtoken',
+    'django.contrib.gis',
     'doctor_management.apps.DoctorManagementConfig',
     'hotel_management',
     'authentication'
@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'doctorino.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'drinodb',  # DATA BASE NAME
         'USER': 'drino',  # DATA BASE USER NAME
         'PASSWORD': 'D@CT@R1N0',  # USER PASSWORD
