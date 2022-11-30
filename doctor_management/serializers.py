@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.response import Response
+
 from .models import Doctor, Specialty
 from authentication.serializers import UserSerializer, UserListSerializer, UserCommonInfoSerializer
 from authentication.models import User
@@ -80,3 +82,10 @@ class DoctorListSerializer(serializers.ModelSerializer):
         specialties = obj.specialties.all()
         serializer = SpecialtySerializer(specialties, many=True)
         return serializer.data
+
+
+class SearchByLocationSpecialtySerializer(serializers.Serializer):
+    lat = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
+    long = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
+    specialties = serializers.ListSerializer(required=False, child=serializers.IntegerField(allow_null=False))
+
