@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'doctor_management.apps.DoctorManagementConfig',
     'hotel_management',
-    'authentication'
+    'authentication',
+    'rest_framework_gis'
 ]
 
 REST_FRAMEWORK = {
