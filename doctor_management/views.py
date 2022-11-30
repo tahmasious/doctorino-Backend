@@ -1,12 +1,16 @@
+from decimal import Decimal
+
+from django.contrib.gis.measure import Distance
 from django.shortcuts import render
+from rest_framework.views import APIView
 from .models import Doctor, Specialty
 from authentication.models import User
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics, viewsets, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import (DoctorDetailSerializer, DoctorListSerializer,
-                        DoctorCreateSerializer, SpecialtySerializer)
-
+                          DoctorCreateSerializer, SpecialtySerializer, SearchByLocationSpecialtySerializer)
+from django.contrib.gis.geos import Point
 from utils.permissions import IsDoctorOrReadOnly
 from django.db import transaction
 from rest_framework.response import Response
@@ -51,3 +55,22 @@ def user_id_to_doctor_id(request, **kwargs):
     except:
         response_data['id'] = 'None'
     return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+class DoctorSearchByLocationSpecialty(APIView):
+    permission_classes = []
+    authentication_classes = []
+
+    def post(self, request, format=None):
+        query_date = SearchByLocationSpecialtySerializer(data=request.data)
+        query_date.is_valid(raise_exception=True)
+        related_doctors = Doctor.objects.all()
+        if 'lat' in query_date.data.keys() and 'long' in query_date.data.keys():
+            lat = float(query_date.data['lat'])
+            long = float(query_date.data['long'])
+            related_doctors = related_doctors.filter(location__distance_lt=(Point(lat, long), Distance(m=5000)))
+        if 'specialties' in query_date.data.keys():
+            specialties = query_date.data['specialties']
+            related_doctors = related_doctors.filter(specialties__in=specialties)
+        serialized_doctors = DoctorListSerializer(related_doctors, many=True)
+        return Response(serialized_doctors.data)
