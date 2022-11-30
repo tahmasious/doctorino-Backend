@@ -1,11 +1,16 @@
 asgiref==3.5.2
+backports.zoneinfo==0.2.1
 Django==4.1.2
 django-cors-headers==3.13.0
 django-rest-framework==0.1.0
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 Pillow==9.3.0
+psycopg==3.1.4
+psycopg-binary==3.1.4
+psycopg2==2.9.5
 PyJWT==2.6.0
 pytz==2022.5
 sqlparse==0.4.3
+typing_extensions==4.4.0
 tzdata==2022.5
