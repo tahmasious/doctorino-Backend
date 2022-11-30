@@ -5,7 +5,7 @@ from authentication.views import UserCreationView
 from rest_framework import routers
 from .views import (DoctorListView, DoctorCreateView,
                     DoctorRetrieveUpdateDestroyView, SpecialtyListView,
-                    user_id_to_doctor_id)
+                    user_id_to_doctor_id, DoctorSearchByLocationSpecialty)
 
 
 app_name = 'doctor_management'
@@ -19,4 +19,7 @@ urlpatterns = [
     path('specialties/', SpecialtyListView.as_view()),
 
     path('user_id_to_doctor_id/<int:pk>/', user_id_to_doctor_id),
+
+    # search
+    path('search/', DoctorSearchByLocationSpecialty.as_view())
 ]
