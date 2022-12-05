@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.response import Response
 
-from .models import Doctor, Specialty
+from .models import Doctor, Specialty, WorkDayPeriod
 from authentication.serializers import UserSerializer, UserListSerializer, UserCommonInfoSerializer
 from authentication.models import User
 
@@ -24,7 +24,9 @@ class SpecialtySerializer(serializers.ModelSerializer):
 
 class DoctorDetailSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
-    
+    specialties = serializers.SerializerMethodField()
+    work_periods = serializers.SerializerMethodField()
+
     class Meta:
         model = Doctor
         fields = "__all__"
@@ -32,6 +34,14 @@ class DoctorDetailSerializer(serializers.ModelSerializer):
     def get_user(self, obj):
         user = obj.user
         return UserListSerializer(user).data
+
+    def get_specialties(self, obj):
+        specialties = obj.specialties
+        return SpecialtySerializer(specialties, many=True).data
+
+    def get_work_periods(self, obj):
+        work_periods = WorkDayPeriod.objects.filter(doctor=obj)
+        return WorkDayPeriodSerializer(work_periods, many=True).data
 
 
 class DoctorCreateSerializer(serializers.ModelSerializer):
@@ -89,3 +99,8 @@ class SearchByLocationSpecialtySerializer(serializers.Serializer):
     long = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
     specialties = serializers.ListSerializer(required=False, child=serializers.IntegerField(allow_null=False))
 
+
+class WorkDayPeriodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkDayPeriod
+        fields = "__all__"
