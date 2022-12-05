@@ -5,11 +5,12 @@ from authentication.views import UserCreationView
 from rest_framework import routers
 from .views import (DoctorListView, DoctorCreateView,
                     DoctorRetrieveUpdateDestroyView, SpecialtyListView,
-                    user_id_to_doctor_id, DoctorSearchByLocationSpecialty)
+                    user_id_to_doctor_id, DoctorSearchByLocationSpecialty, WorkDayPeriodModelViewSet)
 
 
 app_name = 'doctor_management'
-
+router = DefaultRouter()
+router.register(r'', WorkDayPeriodModelViewSet ,basename="workday")
 
 urlpatterns = [
     path('<int:pk>/', DoctorRetrieveUpdateDestroyView.as_view()),
@@ -20,6 +21,9 @@ urlpatterns = [
 
     path('user_id_to_doctor_id/<int:pk>/', user_id_to_doctor_id),
 
-    # search
-    path('search/', DoctorSearchByLocationSpecialty.as_view())
+    # search endpoint
+    path('search/', DoctorSearchByLocationSpecialty.as_view()),
+
+    # work day period times endpoint
+    path('workday/', include(router.urls))
 ]
