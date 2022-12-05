@@ -3,13 +3,14 @@ from decimal import Decimal
 from django.contrib.gis.measure import Distance
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .models import Doctor, Specialty
+from .models import Doctor, Specialty, WorkDayPeriod
 from authentication.models import User
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics, viewsets, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import (DoctorDetailSerializer, DoctorListSerializer,
-                          DoctorCreateSerializer, SpecialtySerializer, SearchByLocationSpecialtySerializer)
+                          DoctorCreateSerializer, SpecialtySerializer, SearchByLocationSpecialtySerializer,
+                          WorkDayPeriodSerializer)
 from django.contrib.gis.geos import Point
 from utils.permissions import IsDoctorOrReadOnly
 from django.db import transaction
@@ -74,3 +75,8 @@ class DoctorSearchByLocationSpecialty(APIView):
             related_doctors = related_doctors.filter(specialties__in=specialties)
         serialized_doctors = DoctorListSerializer(related_doctors, many=True)
         return Response(serialized_doctors.data)
+
+
+class WorkDayPeriodModelViewSet(ModelViewSet):
+    serializer_class = WorkDayPeriodSerializer
+    queryset = WorkDayPeriod.objects.all()
