@@ -637,3 +637,7 @@ MigrationBackup/
 .ionide/
 
 # End of https://www.toptal.com/developers/gitignore/api/vs,virtualenv,visualstudiocode,django,python
+
+**/migrations/**
+!**/migrations
+!**/migrations/__init__.py
