@@ -64,3 +64,20 @@ class WorkDayPeriod(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
+
+
+class Appointment(models.Model):
+    patient = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_reserved = models.DateField()
+    from_time = models.TimeField()
+    to_time = models.TimeField()
+
+    def clean(self):
+        if self.from_time > self.to_time:
+            raise ValidationError(
+                {"from_time": "زمان شروع دوره نباید بعد از زمان پایان دوره کاری باشد."}
+            )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
