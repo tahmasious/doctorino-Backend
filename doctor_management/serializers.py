@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.response import Response
 
-from .models import Doctor, Specialty, WorkDayPeriod
+from .models import Doctor, Specialty, WorkDayPeriod, Appointment
 from authentication.serializers import UserSerializer, UserListSerializer, UserCommonInfoSerializer
 from authentication.models import User
 
@@ -104,3 +104,20 @@ class WorkDayPeriodSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkDayPeriod
         fields = "__all__"
+
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = "__all__"
+
+
+class DetailedAppointmentSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Appointment
+        fields = "__all__"
+
+    def get_user(self, obj):
+        return UserListSerializer(obj.user).data
