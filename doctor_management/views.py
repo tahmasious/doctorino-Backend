@@ -1,16 +1,16 @@
 from decimal import Decimal
-
+from rest_framework.exceptions import ValidationError
 from django.contrib.gis.measure import Distance
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .models import Doctor, Specialty, WorkDayPeriod
+from .models import Doctor, Specialty, WorkDayPeriod, Appointment
 from authentication.models import User
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics, viewsets, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import (DoctorDetailSerializer, DoctorListSerializer,
                           DoctorCreateSerializer, SpecialtySerializer, SearchByLocationSpecialtySerializer,
-                          WorkDayPeriodSerializer)
+                          WorkDayPeriodSerializer, AppointmentSerializer, DetailedAppointmentSerializer)
 from django.contrib.gis.geos import Point
 from utils.permissions import IsDoctorOrReadOnly
 from django.db import transaction
@@ -80,3 +80,41 @@ class DoctorSearchByLocationSpecialty(APIView):
 class WorkDayPeriodModelViewSet(ModelViewSet):
     serializer_class = WorkDayPeriodSerializer
     queryset = WorkDayPeriod.objects.all()
+
+
+class DoctorAllWorkDaysListView(generics.ListAPIView):
+    serializer_class = WorkDayPeriodSerializer
+
+    def get_queryset(self):
+        if not Doctor.objects.filter(id=self.kwargs['pk']).exists():
+            raise ValidationError({
+                "error" :  "دکتری با این آیدی به ثبت نرسیده."
+            })
+        return WorkDayPeriod.objects.filter(doctor_id=self.kwargs['pk'])
+
+
+class AppointmentModelViewSet(ModelViewSet):
+    serializer_class = AppointmentSerializer
+    queryset = Appointment.objects.all()
+
+
+class DoctorAllAppointmentsInProfilePageListView(generics.ListAPIView):  # Patients data is not going to be send !
+    serializer_class = AppointmentSerializer
+
+    def get_queryset(self):
+        if not Doctor.objects.filter(id=self.kwargs['pk']).exists():
+            raise ValidationError({
+                "error" :  "دکتری با این آیدی به ثبت نرسیده."
+            })
+        return Appointment.objects.filter(doctor_id=self.kwargs['pk'])
+
+
+class DetailedDoctorAllAppointmentsListView(generics.ListAPIView):  # include patients data
+    serializer_class = DetailedAppointmentSerializer
+
+    def get_queryset(self):
+        if not Doctor.objects.filter(id=self.kwargs['pk']).exists():
+            raise ValidationError({
+                "error" :  "دکتری با این آیدی به ثبت نرسیده."
+            })
+        return Appointment.objects.filter(doctor_id=self.kwargs['pk'])
