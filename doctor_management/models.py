@@ -3,6 +3,7 @@ from authentication.models import User
 from django.contrib.gis.db import models as lcmodels
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
+from django_jalali.db import models as jmodels
 
 class Specialty(models.Model):
     name = models.CharField(max_length=250, unique=True, blank=False, null=False)
@@ -68,12 +69,13 @@ class WorkDayPeriod(models.Model):
 
 class Appointment(models.Model):
     patient = models.ForeignKey(User, on_delete=models.CASCADE)
-    date_reserved = models.DateField()
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    date_reserved = jmodels.jDateField()
     from_time = models.TimeField()
     to_time = models.TimeField()
 
     def clean(self):
-        if self.from_time > self.to_time:
+        if self.from_time and self.to_time and self.from_time > self.to_time:
             raise ValidationError(
                 {"from_time": "زمان شروع دوره نباید بعد از زمان پایان دوره کاری باشد."}
             )
