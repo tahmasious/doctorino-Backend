@@ -4,6 +4,7 @@ from django.contrib.gis.db import models as lcmodels
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django_jalali.db import models as jmodels
+from rest_framework import serializers
 
 class Specialty(models.Model):
     name = models.CharField(max_length=250, unique=True, blank=False, null=False)
@@ -75,10 +76,21 @@ class Appointment(models.Model):
     to_time = models.TimeField()
 
     def clean(self):
+        errs = dict()
         if self.from_time and self.to_time and self.from_time > self.to_time:
-            raise ValidationError(
-                {"from_time": "زمان شروع دوره نباید بعد از زمان پایان دوره کاری باشد."}
-            )
+            errs['from_time'] = ["زمان شروع دوره نباید بعد از زمان پایان دوره کاری باشد."]
+        if Appointment.objects.filter(
+                to_time__lt=self.to_time,
+                to_time__gt=self.from_time,
+                date_reserved=self.date_reserved).exists() or \
+            Appointment.objects.filter(
+                from_time__lt=self.to_time,
+                from_time__gt=self.from_time,
+                date_reserved=self.date_reserved).exists():
+            errs['from_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
+            errs['to_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
+        if errs:
+            raise ValidationError(errs)
 
     def save(self, *args, **kwargs):
         self.full_clean()

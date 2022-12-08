@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.response import Response
-
+import time
 from .models import Doctor, Specialty, WorkDayPeriod, Appointment
 from authentication.serializers import UserSerializer, UserListSerializer, UserCommonInfoSerializer
 from authentication.models import User
@@ -36,7 +36,7 @@ class DoctorDetailSerializer(serializers.ModelSerializer):
         return UserListSerializer(user).data
 
     def get_specialties(self, obj):
-        specialties = obj.specialties
+        specialties = obj.specialties.all()
         return SpecialtySerializer(specialties, many=True).data
 
     def get_work_periods(self, obj):
@@ -110,6 +110,29 @@ class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = "__all__"
+
+    def validate(self, attrs):
+        errs = dict()
+        data = super(AppointmentSerializer, self).validate(attrs)
+        if Appointment.objects.filter(                        # -------(-----2(pm)------)-------4(pm)------------
+                to_time__lt=data['to_time'],
+                to_time__gt=data['from_time'],
+                date_reserved=data['date_reserved']).exists() or \
+        Appointment.objects.filter(                           # --------------2(pm)------(-------4(pm)--------)----
+                from_time__lt=data['to_time'],
+                from_time__gt=data['from_time'],
+                date_reserved=data['date_reserved']).exists() or \
+        Appointment.objects.filter(                           # ------(--------2(pm)--------------4(pm)--------)----
+                from_time__lt=data['from_time'],
+                to_time__gt=data['to_time'],
+                date_reserved=data['date_reserved']).exists():
+            errs['from_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
+            errs['to_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
+        if data['to_time'] < data['from_time'] :
+            errs['from_time'] = ["زمان شروع دوره نباید بعد از زمان پایان دوره کاری باشد."]
+        if errs:
+            raise serializers.ValidationError(errs)
+        return data
 
 
 class DetailedAppointmentSerializer(serializers.ModelSerializer):
