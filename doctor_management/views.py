@@ -46,6 +46,7 @@ class DoctorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 class SpecialtyListView(generics.ListAPIView):
     serializer_class = SpecialtySerializer
     queryset = Specialty.objects.all()
+    pagination_class = StandardResultsSetPagination
 
 
 def user_id_to_doctor_id(request, **kwargs):
@@ -61,6 +62,7 @@ def user_id_to_doctor_id(request, **kwargs):
 class DoctorSearchByLocationSpecialty(APIView):
     permission_classes = []
     authentication_classes = []
+    pagination_class = StandardResultsSetPagination
 
     def post(self, request, format=None):
         query_date = SearchByLocationSpecialtySerializer(data=request.data)
@@ -80,10 +82,12 @@ class DoctorSearchByLocationSpecialty(APIView):
 class WorkDayPeriodModelViewSet(ModelViewSet):
     serializer_class = WorkDayPeriodSerializer
     queryset = WorkDayPeriod.objects.all()
+    pagination_class = StandardResultsSetPagination
 
 
 class DoctorAllWorkDaysListView(generics.ListAPIView):
     serializer_class = WorkDayPeriodSerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         if not Doctor.objects.filter(id=self.kwargs['pk']).exists():
@@ -96,10 +100,11 @@ class DoctorAllWorkDaysListView(generics.ListAPIView):
 class AppointmentModelViewSet(ModelViewSet):
     serializer_class = AppointmentSerializer
     queryset = Appointment.objects.all()
-
+    pagination_class = StandardResultsSetPagination
 
 class DoctorAllAppointmentsInProfilePageListView(generics.ListAPIView):  # Patients data is not going to be send !
     serializer_class = AppointmentSerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         if not Doctor.objects.filter(id=self.kwargs['pk']).exists():
@@ -111,6 +116,7 @@ class DoctorAllAppointmentsInProfilePageListView(generics.ListAPIView):  # Patie
 
 class DetailedDoctorAllAppointmentsListView(generics.ListAPIView):  # include patients data
     serializer_class = DetailedAppointmentSerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         if not Doctor.objects.filter(id=self.kwargs['pk']).exists():

@@ -54,6 +54,7 @@ class RoomRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
 class RoomListCreateView(generics.ListCreateAPIView):
     serializer_class = RoomSerializer
     queryset = Room.objects.all()
+    pagination_class = StandardResultsSetPagination
 
 
 class HotelRoomsListView(generics.ListAPIView):
@@ -71,6 +72,7 @@ class HotelRoomImageCreateView(generics.CreateAPIView):
 class FeatureListView(generics.ListAPIView):
     serializer_class = FeatureSerializer
     queryset = Feature.objects.all()
+    pagination_class = StandardResultsSetPagination
 
 
 class HotelOwnerUpdateView(generics.RetrieveUpdateAPIView):
@@ -86,6 +88,7 @@ class HotelOwnerCreateView(generics.CreateAPIView):
 
 class HotelOwnerHotelsListView(generics.ListAPIView):
     serializer_class = HotelListSerializer
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
         if not (self.request.user.is_hotel_owner or self.request.user.is_superuser) :
