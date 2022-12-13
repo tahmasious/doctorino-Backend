@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from authentication.models import User, HotelOwner
 
@@ -26,6 +27,17 @@ class Hotel(models.Model):
     def __str__(self):
         return self.hotel_name
 
+    @property
+    def rate(self):
+        query = HotelReview.objects.filter(hotel=self)
+        if not query.exists():
+            return 0
+        count = len(query)
+        sum = 0
+        for review in query:
+            sum += review.score
+        return round(float(sum / count), 2)
+
 
 class Room(models.Model):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
@@ -41,3 +53,8 @@ class RoomImage(models.Model):
     is_cover = models.BooleanField(default=False, blank=True, null=True)
 
 
+class HotelReview(models.Model):
+    voter = models.ForeignKey(User, on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    score = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    text = models.TextField(null=True, blank=True)

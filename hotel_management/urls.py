@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView, RoomListCreateView, \
     HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView, HotelOwnerUpdateView, \
-    HotelOwnerCreateView, HotelOwnerHotelsListView
+    HotelOwnerCreateView, HotelOwnerHotelsListView, HotelReviewListCreateView
 
 urlpatterns = [
     # Hotel urls
@@ -23,6 +23,10 @@ urlpatterns = [
     # owner urls
     path('owner/<int:pk>/', HotelOwnerUpdateView.as_view()),          # update and retrieve
     path('owner/new/', HotelOwnerCreateView.as_view()),               # create new hotel owner
-    path('owner/hotel-list/', HotelOwnerHotelsListView.as_view())
+    path('owner/hotel-list/', HotelOwnerHotelsListView.as_view()),
+
+    # hotel reviews
+    path('reviews/', HotelReviewListCreateView.as_view()),
+    path('<int:pk>/reviews/', HotelReviewListCreateView.as_view())
 ]
 

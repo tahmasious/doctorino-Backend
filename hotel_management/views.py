@@ -7,10 +7,11 @@ from rest_framework.response import Response
 
 from authentication.models import HotelOwner
 from doctorino.pagination import StandardResultsSetPagination
-from hotel_management.models import Hotel, Room, RoomImage, Feature
+from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
-    FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer
+    FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer, \
+    HotelReviewSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly
 
 
@@ -96,3 +97,18 @@ class HotelOwnerHotelsListView(generics.ListAPIView):
             raise ValidationError(detail=context)
         hotel_owner_id = self.request.user.owner.filter().last().id
         return Hotel.objects.filter(hotel_owner_id=hotel_owner_id)
+
+
+class HotelReviewListCreateView(generics.ListCreateAPIView):
+    serializer_class = HotelReviewSerializer
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        if 'pk' not in self.kwargs:
+            return HotelReview.objects.all()
+
+        if not Hotel.objects.filter(id=self.kwargs['pk']).exists():
+            raise ValidationError({
+                "error": "دکتری با این آیدی به ثبت نرسیده."
+            })
+        return HotelReview.objects.filter(hotel_id=self.kwargs['pk'])
