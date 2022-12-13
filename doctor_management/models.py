@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from authentication.models import User
 from django.contrib.gis.db import models as lcmodels
@@ -39,6 +40,17 @@ class Doctor(models.Model):
 
     def __str__(self):
         return self.user.first_name + " " + self.user.last_name
+
+    @property
+    def rate(self):
+        query = DoctorReview.objects.filter(doctor=self)
+        if not query.exists():
+            return 0
+        count = len(query)
+        sum = 0
+        for review in query:
+            sum += review.score
+        return round(float(sum/count), 2)
 
 
 class WorkDayPeriod(models.Model):
@@ -97,3 +109,10 @@ class Appointment(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         return super().save(*args, **kwargs)
+
+
+class DoctorReview(models.Model):
+    voter = models.ForeignKey(User, on_delete=models.CASCADE)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    score = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    text = models.TextField(null=True, blank=True)

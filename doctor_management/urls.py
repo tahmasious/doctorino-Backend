@@ -7,7 +7,7 @@ from .views import (DoctorListView, DoctorCreateView,
                     DoctorRetrieveUpdateDestroyView, SpecialtyListView,
                     user_id_to_doctor_id, DoctorSearchByLocationSpecialty, WorkDayPeriodModelViewSet,
                     AppointmentModelViewSet, DoctorAllWorkDaysListView, DoctorAllAppointmentsInProfilePageListView,
-                    DetailedDoctorAllAppointmentsListView)
+                    DetailedDoctorAllAppointmentsListView, DoctorReviewListCreateView)
 
 
 app_name = 'doctor_management'
@@ -36,5 +36,10 @@ urlpatterns = [
     # appointment endpoints
     path('appointment/', include(appointment_router.urls)),  # new - delete - update - retrieve - list
     path('<int:pk>/appointment/', DoctorAllAppointmentsInProfilePageListView.as_view()),  # all appointments of specific doctor for profile page
-    path('<int:pk>/appointment/detailed/', DetailedDoctorAllAppointmentsListView.as_view())  #  all appointments of specific doctor for doctor panel
+    path('<int:pk>/appointment/detailed/', DetailedDoctorAllAppointmentsListView.as_view()),  #  all appointments of specific doctor for doctor panel
+
+    # doctor review endpoints
+    path('reviews/', DoctorReviewListCreateView.as_view()),
+    path('<int:pk>/reviews/', DoctorReviewListCreateView.as_view())
+
 ]

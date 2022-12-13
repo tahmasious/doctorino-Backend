@@ -3,14 +3,15 @@ from rest_framework.exceptions import ValidationError
 from django.contrib.gis.measure import Distance
 from django.shortcuts import render
 from rest_framework.views import APIView
-from .models import Doctor, Specialty, WorkDayPeriod, Appointment
+from .models import Doctor, Specialty, WorkDayPeriod, Appointment, DoctorReview
 from authentication.models import User
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics, viewsets, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import (DoctorDetailSerializer, DoctorListSerializer,
                           DoctorCreateSerializer, SpecialtySerializer, SearchByLocationSpecialtySerializer,
-                          WorkDayPeriodSerializer, AppointmentSerializer, DetailedAppointmentSerializer)
+                          WorkDayPeriodSerializer, AppointmentSerializer, DetailedAppointmentSerializer,
+                          DoctorReviewSerializer)
 from django.contrib.gis.geos import Point
 from utils.permissions import IsDoctorOrReadOnly
 from django.db import transaction
@@ -124,3 +125,18 @@ class DetailedDoctorAllAppointmentsListView(generics.ListAPIView):  # include pa
                 "error" :  "دکتری با این آیدی به ثبت نرسیده."
             })
         return Appointment.objects.filter(doctor_id=self.kwargs['pk'])
+
+
+class DoctorReviewListCreateView(generics.ListCreateAPIView):
+    serializer_class = DoctorReviewSerializer
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        if 'pk' not in self.kwargs:
+            return DoctorReview.objects.all()
+
+        if not Doctor.objects.filter(id=self.kwargs['pk']).exists():
+            raise ValidationError({
+                "error": "دکتری با این آیدی به ثبت نرسیده."
+            })
+        return DoctorReview.objects.filter(doctor_id=self.kwargs['pk'])

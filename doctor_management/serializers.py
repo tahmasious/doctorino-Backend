@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.response import Response
 import time
-from .models import Doctor, Specialty, WorkDayPeriod, Appointment
+from .models import Doctor, Specialty, WorkDayPeriod, Appointment, DoctorReview
 from authentication.serializers import UserSerializer, UserListSerializer, UserCommonInfoSerializer
 from authentication.models import User
 
@@ -26,6 +26,7 @@ class DoctorDetailSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     specialties = serializers.SerializerMethodField()
     work_periods = serializers.SerializerMethodField()
+    rate = serializers.ReadOnlyField()
 
     class Meta:
         model = Doctor
@@ -83,7 +84,8 @@ class DoctorCreateSerializer(serializers.ModelSerializer):
 class DoctorListSerializer(serializers.ModelSerializer):
     specialties = serializers.SerializerMethodField()
     user = UserCommonInfoSerializer()
-    
+    rate = serializers.ReadOnlyField()
+
     class Meta:
         model = Doctor
         exclude = ('license_proof', 'is_active', 'national_code',)
@@ -144,3 +146,9 @@ class DetailedAppointmentSerializer(serializers.ModelSerializer):
 
     def get_user(self, obj):
         return UserListSerializer(obj.user).data
+
+
+class DoctorReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DoctorReview
+        fields = "__all__"
