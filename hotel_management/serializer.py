@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from authentication.models import HotelOwner, User
 from authentication.serializers import UserSerializer, UserListSerializer
-from hotel_management.models import Hotel, Room, RoomImage, Feature
+from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
 
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
@@ -196,3 +196,31 @@ class HotelOwnerUpdateRetrieveSerializer(serializers.ModelSerializer):
             User.objects.filter(id=instance.user.id).update(**user_data)
         return super(HotelOwnerUpdateRetrieveSerializer, self).update(instance, validated_data)
 
+
+class HotelReserveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HotelReservation
+        fields = "__all__"
+
+    # def validate(self, attrs):
+    #     errs = dict()
+    #     data = super(AppointmentSerializer, self).validate(attrs)
+    #     if Appointment.objects.filter(                        # -------(-----2(pm)------)-------4(pm)------------
+    #             to_time__lt=data['to_time'],
+    #             to_time__gt=data['from_time'],
+    #             date_reserved=data['date_reserved']).exists() or \
+    #     Appointment.objects.filter(                           # --------------2(pm)------(-------4(pm)--------)----
+    #             from_time__lt=data['to_time'],
+    #             from_time__gt=data['from_time'],
+    #             date_reserved=data['date_reserved']).exists() or \
+    #     Appointment.objects.filter(                           # ------(--------2(pm)--------------4(pm)--------)----
+    #             from_time__lt=data['from_time'],
+    #             to_time__gt=data['to_time'],
+    #             date_reserved=data['date_reserved']).exists():
+    #         errs['from_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
+    #         errs['to_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
+    #     if data['to_time'] < data['from_time'] :
+    #         errs['from_time'] = ["زمان شروع دوره نباید بعد از زمان پایان دوره کاری باشد."]
+    #     if errs:
+    #         raise serializers.ValidationError(errs)
+    #     return data

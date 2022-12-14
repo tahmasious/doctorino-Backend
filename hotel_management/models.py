@@ -1,9 +1,14 @@
 from django.db import models
 from authentication.models import User, HotelOwner
+from django.core.exceptions import ValidationError
+from django_jalali.db import models as jmodels
+from django.core.exceptions import ValidationError
 
 
 def get_default_hotel_image_cover():
     return 'hotel-images/default_hotel_image.jpg'
+
+
 class Feature(models.Model):
     title = models.CharField(max_length=256, null=True)
 
@@ -32,6 +37,10 @@ class Room(models.Model):
     quantity = models.IntegerField(default=1, blank=True)
     bed_count = models.SmallIntegerField(default=1, blank=True)
     price_per_night = models.PositiveIntegerField(null=True)
+    room_title = models.CharField(max_length=300, blank=True, null=True)
+    occupied_count = models.IntegerField(default=0, blank=True)
+    # is_active = is_active = models.BooleanField(default=True, blank=True, null=True)
+    # features = models.ManyToManyField(Feature, related_name="features", blank=True, null=True)
 
 
 class RoomImage(models.Model):
@@ -41,3 +50,8 @@ class RoomImage(models.Model):
     is_cover = models.BooleanField(default=False, blank=True, null=True)
 
 
+class HotelReservation(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    hotel_room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    from_date = jmodels.jDateField()
+    to_date = jmodels.jDateField()

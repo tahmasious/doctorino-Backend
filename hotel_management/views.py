@@ -1,17 +1,20 @@
 from django.db import transaction
 from rest_framework import generics, status
 from rest_framework import viewsets
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from authentication.models import HotelOwner
 from doctorino.pagination import StandardResultsSetPagination
-from hotel_management.models import Hotel, Room, RoomImage, Feature
+from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
-    FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer
+    FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer,\
+    HotelReserveSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly
+from doctorino.pagination import StandardResultsSetPagination
 
 
 class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -96,3 +99,9 @@ class HotelOwnerHotelsListView(generics.ListAPIView):
             raise ValidationError(detail=context)
         hotel_owner_id = self.request.user.owner.filter().last().id
         return Hotel.objects.filter(hotel_owner_id=hotel_owner_id)
+
+
+class HotelReservationModelViewSet(ModelViewSet):
+    serializer_class = HotelReserveSerializer
+    queryset = HotelReservation.objects.all()
+    pagination_class = StandardResultsSetPagination

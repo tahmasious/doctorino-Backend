@@ -1,9 +1,15 @@
 from django.urls import path, include
 from rest_framework import routers
+from rest_framework.routers import DefaultRouter
 
 from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView, RoomListCreateView, \
     HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView, HotelOwnerUpdateView, \
-    HotelOwnerCreateView, HotelOwnerHotelsListView
+    HotelOwnerCreateView, HotelOwnerHotelsListView, HotelReservationModelViewSet
+
+
+app_name = 'hotel_management'
+hotel_reserve_router = DefaultRouter()
+hotel_reserve_router.register(r'', HotelReservationModelViewSet, basename="hotel_reserve")
 
 urlpatterns = [
     # Hotel urls
@@ -23,6 +29,11 @@ urlpatterns = [
     # owner urls
     path('owner/<int:pk>/', HotelOwnerUpdateView.as_view()),          # update and retrieve
     path('owner/new/', HotelOwnerCreateView.as_view()),               # create new hotel owner
-    path('owner/hotel-list/', HotelOwnerHotelsListView.as_view())
+    path('owner/hotel-list/', HotelOwnerHotelsListView.as_view()),
+
+    # hotel reserve endpoints
+    path('hotel_reserve/', include(hotel_reserve_router.urls)),
+
+
 ]
 
