@@ -117,17 +117,20 @@ class AppointmentSerializer(serializers.ModelSerializer):
         errs = dict()
         data = super(AppointmentSerializer, self).validate(attrs)
         if Appointment.objects.filter(                        # -------(-----2(pm)------)-------4(pm)------------
-                to_time__lt=data['to_time'],
-                to_time__gt=data['from_time'],
-                date_reserved=data['date_reserved']).exists() or \
+                to_time__lte=data['to_time'],
+                to_time__gte=data['from_time'],
+                date_reserved=data['date_reserved'],
+                doctor=data['doctor']).exists() or \
         Appointment.objects.filter(                           # --------------2(pm)------(-------4(pm)--------)----
-                from_time__lt=data['to_time'],
-                from_time__gt=data['from_time'],
-                date_reserved=data['date_reserved']).exists() or \
+                from_time__lte=data['to_time'],
+                from_time__gte=data['from_time'],
+                date_reserved=data['date_reserved'],
+                doctor=data['doctor']).exists() or \
         Appointment.objects.filter(                           # ------(--------2(pm)--------------4(pm)--------)----
-                from_time__lt=data['from_time'],
-                to_time__gt=data['to_time'],
-                date_reserved=data['date_reserved']).exists():
+                from_time__lte=data['from_time'],
+                to_time__gte=data['to_time'],
+                date_reserved=data['date_reserved'],
+                doctor=data['doctor']).exists():
             errs['from_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
             errs['to_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
         if data['to_time'] < data['from_time'] :
