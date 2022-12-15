@@ -202,25 +202,51 @@ class HotelReserveSerializer(serializers.ModelSerializer):
         model = HotelReservation
         fields = "__all__"
 
-    # def validate(self, attrs):
-    #     errs = dict()
-    #     data = super(AppointmentSerializer, self).validate(attrs)
-    #     if Appointment.objects.filter(                        # -------(-----2(pm)------)-------4(pm)------------
-    #             to_time__lt=data['to_time'],
-    #             to_time__gt=data['from_time'],
-    #             date_reserved=data['date_reserved']).exists() or \
-    #     Appointment.objects.filter(                           # --------------2(pm)------(-------4(pm)--------)----
-    #             from_time__lt=data['to_time'],
-    #             from_time__gt=data['from_time'],
-    #             date_reserved=data['date_reserved']).exists() or \
-    #     Appointment.objects.filter(                           # ------(--------2(pm)--------------4(pm)--------)----
-    #             from_time__lt=data['from_time'],
-    #             to_time__gt=data['to_time'],
-    #             date_reserved=data['date_reserved']).exists():
-    #         errs['from_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
-    #         errs['to_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
-    #     if data['to_time'] < data['from_time'] :
-    #         errs['from_time'] = ["زمان شروع دوره نباید بعد از زمان پایان دوره کاری باشد."]
-    #     if errs:
-    #         raise serializers.ValidationError(errs)
-    #     return data
+    def validate(self, attrs):
+        errs = dict()
+        data = super(HotelReserveSerializer, self).validate(attrs)
+
+        room = Room.objects.get(pk=data['hotel_room'])
+
+        reserves_of_room = HotelReservation.objects.filter(room=room)
+
+        # ----(---start_requested----)-----end_requested----
+        case_1 = reserves_of_room.filter(to_date > data['from_date'], to_date <= data['to_date'])             
+        
+        # --------start_requested-----(----end_requested----)
+        case_2 = reserves_of_room.filter(from_date < data['to_date'], from_date >= data['from_date'])
+
+        # ----(---start_requested----------end_requested----)
+        case_3 = reserves_of_room.filter(to_date > data['from_date'], to_date <= data['to_date'])
+
+
+        # if Appointment.objects.filter(                        # -------(-----2(pm)------)-------4(pm)------------
+        #         to_time__le=data['to_time'],
+        #         to_time__gt=data['from_time'],
+        #         date_reserved=data['date_reserved']).exists() or \
+        # Appointment.objects.filter(                           # --------------2(pm)------(-------4(pm)--------)----
+        #         from_time__lt=data['to_time'],
+        #         from_time__gt=data['from_time'],
+        #         date_reserved=data['date_reserved']).exists() or \
+        # Appointment.objects.filter(                           # ------(--------2(pm)--------------4(pm)--------)----
+        #         from_time__lt=data['from_time'],
+        #         to_time__gt=data['to_time'],
+        #         date_reserved=data['date_reserved']).exists():
+        #     errs['from_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
+        #     errs['to_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
+        # if data['to_time'] < data['from_time'] :
+        #     errs['from_time'] = ["زمان شروع دوره نباید بعد از زمان پایان دوره کاری باشد."]
+        if errs:
+            raise serializers.ValidationError(errs)
+        return data
+
+
+class DetailedHotelReservationSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = HotelReservation
+        fields = "__all__"
+
+    def get_user(self, obj):
+        return UserListSerializer(obj.user).data

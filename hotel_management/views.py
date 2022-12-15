@@ -1,6 +1,7 @@
 from django.db import transaction
 from rest_framework import generics, status
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
@@ -12,7 +13,7 @@ from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReserv
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
     FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer,\
-    HotelReserveSerializer
+    HotelReserveSerializer, DetailedHotelReservationSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly
 from doctorino.pagination import StandardResultsSetPagination
 
@@ -105,3 +106,35 @@ class HotelReservationModelViewSet(ModelViewSet):
     serializer_class = HotelReserveSerializer
     queryset = HotelReservation.objects.all()
     pagination_class = StandardResultsSetPagination
+
+
+class HotelAllReservationListView(generics.ListAPIView):
+    serializer_class = DetailedHotelReservationSerializer
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        if not Doctor.objects.filter(id=self.kwargs['pk']).exists():
+            raise ValidationError({
+                "error" :  "هتلی با این آیدی به ثبت نرسیده."
+            })
+        return Appointment.objects.filter(doctor_id=self.kwargs['pk'])
+
+
+class HotelSearchByLocationDate(APIView):
+    permission_classes = []
+    authentication_classes = []
+    pagination_class = StandardResultsSetPagination
+
+    def post(self, request, format=None):
+        query = SearchByLocationSpecialtySerializer(data=request.data)
+        query.is_valid(raise_exception=True)
+        related_doctors = Doctor.objects.all()
+        if 'lat' in query.data.keys() and 'long' in query.data.keys():
+            lat = float(query.data['lat'])
+            long = float(query.data['long'])
+            related_doctors = related_doctors.filter(location__distance_lt=(Point(lat, long), Distance(m=5000)))
+        if 'specialties' in query.data.keys():
+            specialties = query.data['specialties']
+            related_doctors = related_doctors.filter(specialties__in=specialties)
+        serialized_doctors = DoctorListSerializer(related_doctors, many=True)
+        return Response(serialized_doctors.data)

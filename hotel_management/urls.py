@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView, RoomListCreateView, \
     HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView, HotelOwnerUpdateView, \
-    HotelOwnerCreateView, HotelOwnerHotelsListView, HotelReservationModelViewSet
+    HotelOwnerCreateView, HotelOwnerHotelsListView, HotelReservationModelViewSet, HotelAllReservationListView
 
 
 app_name = 'hotel_management'
@@ -33,7 +33,7 @@ urlpatterns = [
 
     # hotel reserve endpoints
     path('hotel_reserve/', include(hotel_reserve_router.urls)),
-
+    path('<int:pk>/hotel_reserve/', HotelAllReservationListView.as_view()),
 
 ]
 
