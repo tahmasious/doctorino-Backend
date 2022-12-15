@@ -24,7 +24,7 @@ class SpecialtySerializer(serializers.ModelSerializer):
 
 class DoctorDetailSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
-    specialties = serializers.SerializerMethodField()
+    specialties = ReadWriteSerializerMethodField()
     work_periods = serializers.SerializerMethodField()
     rate = serializers.ReadOnlyField()
 
