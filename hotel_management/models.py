@@ -53,6 +53,11 @@ class RoomImage(models.Model):
     is_cover = models.BooleanField(default=False, blank=True, null=True)
 
 
+class HotelImage(models.Model):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='hotel-image', blank=True, null=True)
+
+
 class HotelReview(models.Model):
     voter = models.ForeignKey(User, on_delete=models.CASCADE)
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
