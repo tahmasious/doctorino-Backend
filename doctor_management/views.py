@@ -66,15 +66,15 @@ class DoctorSearchByLocationSpecialty(APIView):
     pagination_class = StandardResultsSetPagination
 
     def post(self, request, format=None):
-        query_date = SearchByLocationSpecialtySerializer(data=request.data)
-        query_date.is_valid(raise_exception=True)
-        related_doctors = Doctor.objects.all()
-        if 'lat' in query_date.data.keys() and 'long' in query_date.data.keys():
-            lat = float(query_date.data['lat'])
-            long = float(query_date.data['long'])
+        serialized_input = SearchByLocationSpecialtySerializer(data=request.data)
+        serialized_input.is_valid(raise_exception=True)
+        related_doctors = Doctor.objects.filter(is_active=True)
+        if 'lat' in serialized_input.data.keys() and 'long' in serialized_input.data.keys():
+            lat = float(serialized_input.data['lat'])
+            long = float(serialized_input.data['long'])
             related_doctors = related_doctors.filter(location__distance_lt=(Point(lat, long), Distance(m=5000)))
-        if 'specialties' in query_date.data.keys():
-            specialties = query_date.data['specialties']
+        if 'specialties' in serialized_input.data.keys():
+            specialties = serialized_input.data['specialties']
             related_doctors = related_doctors.filter(specialties__in=specialties)
         serialized_doctors = DoctorListSerializer(related_doctors, many=True)
         return Response(serialized_doctors.data)
