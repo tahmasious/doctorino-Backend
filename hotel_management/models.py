@@ -5,6 +5,8 @@ from authentication.models import User, HotelOwner
 
 def get_default_hotel_image_cover():
     return 'hotel-images/default_hotel_image.jpg'
+
+
 class Feature(models.Model):
     title = models.CharField(max_length=256, null=True)
 
@@ -23,6 +25,7 @@ class Hotel(models.Model):
     rules = models.CharField(max_length=256, blank=True, null=True)
     is_active = models.BooleanField(default=False)
     features = models.ManyToManyField(Feature, related_name="features", blank=True, null=True)
+    phone_number = models.CharField(max_length=11, blank=False, null=True)
 
     def __str__(self):
         return self.hotel_name
