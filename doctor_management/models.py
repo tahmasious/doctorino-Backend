@@ -87,22 +87,14 @@ class Appointment(models.Model):
     date_reserved = jmodels.jDateField()
     from_time = models.TimeField()
     to_time = models.TimeField()
+    patient_name = models.CharField(max_length=256, blank=False, null=True)
+    national_code = models.CharField(max_length=10, blank=False, null=True)
 
     def clean(self):
         errs = dict()
         if self.from_time and self.to_time :
             if self.from_time > self.to_time:
                 errs['from_time'] = ["زمان شروع دوره نباید بعد از زمان پایان دوره کاری باشد."]
-            if Appointment.objects.filter(
-                    to_time__lt=self.to_time,
-                    to_time__gt=self.from_time,
-                    date_reserved=self.date_reserved).exists() or \
-                Appointment.objects.filter(
-                    from_time__lt=self.to_time,
-                    from_time__gt=self.from_time,
-                    date_reserved=self.date_reserved).exists():
-                errs['from_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
-                errs['to_time'] = ['این تایم رزرو با تایم ها اکتیو قبلی تداخل دارد']
         if errs:
             raise ValidationError(errs)
 
