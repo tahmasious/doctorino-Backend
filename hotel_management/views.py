@@ -7,11 +7,11 @@ from rest_framework.response import Response
 
 from authentication.models import HotelOwner
 from doctorino.pagination import StandardResultsSetPagination
-from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview
+from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview, HotelImage
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
     FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer, \
-    HotelReviewSerializer
+    HotelReviewSerializer, HotelImageSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly
 
 
@@ -112,3 +112,13 @@ class HotelReviewListCreateView(generics.ListCreateAPIView):
                 "error": "دکتری با این آیدی به ثبت نرسیده."
             })
         return HotelReview.objects.filter(hotel_id=self.kwargs['pk'])
+
+
+class HotelImageCreateView(generics.CreateAPIView):
+    serializer_class = HotelImageSerializer
+    queryset = HotelImage.objects.all()
+
+
+class HotelImageDestroyView(generics.DestroyAPIView):
+    serializer_class = HotelImageSerializer
+    queryset = HotelImage.objects.all()
