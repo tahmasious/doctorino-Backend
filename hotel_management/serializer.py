@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from authentication.models import HotelOwner, User
 from authentication.serializers import UserSerializer, UserListSerializer
-from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview
+from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview, HotelImage
 
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
@@ -47,6 +47,8 @@ class HotelDetailSerializer(serializers.ModelSerializer):
     hotel_owner = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
     rate = serializers.ReadOnlyField()
+    features = ReadWriteSerializerMethodField()
+    images = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
@@ -60,6 +62,14 @@ class HotelDetailSerializer(serializers.ModelSerializer):
         user = obj.hotel_owner.user
         return UserListSerializer(user).data
 
+    def get_features(self, obj):
+        features = obj.features.all()
+        serializer = FeatureSerializer(features, many=True)
+        return serializer.data
+
+    def get_images(self, obj):
+        images = HotelImage.objects.filter(hotel_id=obj.id)
+        return  HotelImageSerializer(images, many=True).data
 
 class HotelCreateSerializer(serializers.ModelSerializer):
     hotel_owner = ReadWriteSerializerMethodField(required=False)
@@ -202,4 +212,10 @@ class HotelOwnerUpdateRetrieveSerializer(serializers.ModelSerializer):
 class HotelReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = HotelReview
+        fields = "__all__"
+
+
+class HotelImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HotelImage
         fields = "__all__"
