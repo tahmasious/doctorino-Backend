@@ -114,11 +114,11 @@ class HotelAllReservationListView(generics.ListAPIView):
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        if not Doctor.objects.filter(id=self.kwargs['pk']).exists():
+        if not Hotel.objects.filter(id=self.kwargs['pk']).exists():
             raise ValidationError({
                 "error" :  "هتلی با این آیدی به ثبت نرسیده."
             })
-        return Appointment.objects.filter(doctor_id=self.kwargs['pk'])
+        return HotelReservation.objects.filter(hotel_id=self.kwargs['pk'])
 
 
 class HotelSearchByLocation(APIView):
