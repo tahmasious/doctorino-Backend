@@ -14,7 +14,7 @@ from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReserv
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
     FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer, \
-    HotelReviewSerializer, HotelImageSerializer
+    HotelReviewSerializer, HotelImageSerializer, \
     FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer,\
     HotelReserveSerializer, DetailedHotelReservationSerializer, HotelSearchByLocationSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly

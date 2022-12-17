@@ -3,10 +3,10 @@ from rest_framework import routers
 from rest_framework.routers import DefaultRouter
 
 from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView, RoomListCreateView, \
-    HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView, HotelOwnerUpdateView, \
-    HotelOwnerCreateView, HotelOwnerHotelsListView, HotelReviewListCreateView, HotelImageCreateView, \
-    HotelImageDestroyView
-    HotelOwnerCreateView, HotelOwnerHotelsListView, HotelReservationModelViewSet, HotelAllReservationListView, \
+    HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView, HotelOwnerUpdateView,\
+    HotelOwnerCreateView, HotelReviewListCreateView, HotelImageCreateView, \
+    HotelImageDestroyView, \
+    HotelOwnerHotelsListView, HotelReservationModelViewSet, HotelAllReservationListView, \
     HotelSearchByLocation, HotelAvailableRooms
 
 from .converters import DateConverter

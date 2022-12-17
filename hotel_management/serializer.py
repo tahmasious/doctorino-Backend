@@ -6,7 +6,6 @@ from authentication.models import HotelOwner, User
 from authentication.serializers import UserSerializer, UserListSerializer
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview, HotelImage
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
-from django_jalali.db import models as jmodels
 import datetime
 
 
