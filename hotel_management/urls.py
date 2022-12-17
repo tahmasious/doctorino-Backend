@@ -46,7 +46,6 @@ urlpatterns = [
 
     # search endpoint
     path('search/', HotelSearchByLocation.as_view()),
-    path('owner/hotel-list/', HotelOwnerHotelsListView.as_view()),
 
     # hotel reviews
     path('reviews/', HotelReviewListCreateView.as_view()),
