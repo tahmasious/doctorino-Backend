@@ -5,6 +5,9 @@ from rest_framework import serializers
 from authentication.models import HotelOwner, User
 from authentication.serializers import UserSerializer, UserListSerializer
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview, HotelImage
+from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
+from django_jalali.db import models as jmodels
+import datetime
 
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
@@ -208,6 +211,68 @@ class HotelOwnerUpdateRetrieveSerializer(serializers.ModelSerializer):
             User.objects.filter(id=instance.user.id).update(**user_data)
         return super(HotelOwnerUpdateRetrieveSerializer, self).update(instance, validated_data)
 
+
+class HotelReserveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HotelReservation
+        fields = "__all__"
+
+    def validate(self, attrs):
+        errs = dict()
+        data = super(HotelReserveSerializer, self).validate(attrs)
+
+        if data['from_date'] < datetime.date.today():
+            errs['before today'] = ['نمیتوان برای قبل از امروز رزرو کرد.']
+            raise serializers.ValidationError(errs)
+
+        if data['from_date'] > data['to_date']:
+            errs['start after end'] = ['تاریخ اتمام رزرو نمیتواند قبل از تاریخ شروع آن باشد.']
+            raise serializers.ValidationError(errs)
+
+        if data['from_date'] == data['to_date']:
+            errs['start equal to end'] = ['تاریخ شروع روزر و پایان آن نباید برابر باشد']
+            raise serializers.ValidationError(errs)
+
+        room = Room.objects.get(pk=data['hotel_room'].id)
+
+        reserves_of_room = HotelReservation.objects.filter(hotel_room=room)
+
+        # ----(---start_requested----)-----end_requested----
+        case_1 = reserves_of_room.filter(to_date__gt=data['from_date'], to_date__lte=data['to_date']).count()
+
+        # --------start_requested-----(----end_requested----)
+        case_2 = reserves_of_room.filter(from_date__lt=data['to_date'], from_date__gte=data['from_date']).count()
+
+        # ----(---start_requested----------end_requested----)
+        case_3 = reserves_of_room.filter(from_date__lt=data['from_date'], to_date__gt=data['to_date']).count()
+
+        #---------start_requested(--------)end_requested-----
+        case_4 = reserves_of_room.filter(from_date__gte= data['from_date'], to_date__lte=data['to_date']).count()
+
+        number_of_reserved = case_1 + case_2 + case_3 - case_4
+
+        if number_of_reserved >= room.quantity:
+            errs['room_full'] = ['ظرفیت این اتاق پر است.']
+
+        if errs:
+            raise serializers.ValidationError(errs)
+        return data
+
+
+class DetailedHotelReservationSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = HotelReservation
+        fields = "__all__"
+
+    def get_user(self, obj):
+        return UserListSerializer(obj.user).data
+
+
+class HotelSearchByLocationSerializer(serializers.Serializer):
+    lat = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
+    long = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
 
 class HotelReviewSerializer(serializers.ModelSerializer):
     class Meta:
