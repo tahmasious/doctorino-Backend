@@ -176,12 +176,8 @@ class HotelAvailableRooms(generics.ListAPIView):
 
     def get_queryset(self):
         result = []
-        print("-------------------------")
         self.hotel = get_object_or_404(Hotel, pk=self.kwargs['pk'])
-        print(self.hotel)
-
         self.from_date = self.kwargs['from']
-        print(self.from_date)
         self.to_date = self.kwargs['to']
         rooms_of_hotel = Room.objects.filter(hotel=self.hotel)
 
