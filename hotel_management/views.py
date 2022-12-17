@@ -158,19 +158,16 @@ class HotelAvailableRooms(generics.ListAPIView):
 
         for room in rooms_of_hotel:
             reserves_of_room = HotelReservation.objects.filter(hotel_room=room)
-            case_1 = reserves_of_room.filter(to_date__gt=self.from_date, to_date__lte=self.to_date).count()
-            print(case_1)             
+            case_1 = reserves_of_room.filter(to_date__gt=self.from_date, to_date__lte=self.to_date).count()     
             
             # --------start_requested-----(----end_requested----)
             case_2 = reserves_of_room.filter(from_date__lt=self.to_date, from_date__gte=self.from_date).count()
-            print(case_2)
 
             # ----(---start_requested----------end_requested----)
             case_3 = reserves_of_room.filter(from_date__lt=self.from_date, to_date__gt=self.to_date).count()
-            print(case_3)
-
+            
+            # ---------start_requested(--------)end_requested-----
             case_4 = reserves_of_room.filter(from_date__gte= self.from_date, to_date__lte=self.to_date).count()
-            print(case_4)
 
             number_of_reserved = case_1 + case_2 + case_3 - case_4
             if number_of_reserved < room.quantity:
