@@ -13,9 +13,10 @@ from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReserv
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
     FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer,\
-    HotelReserveSerializer, DetailedHotelReservationSerializer
+    HotelReserveSerializer, DetailedHotelReservationSerializer, HotelSearchByLocationSerializer
 from utils.permissions import IsHotelOwnerOrReadOnly
 from doctorino.pagination import StandardResultsSetPagination
+from django.shortcuts import get_object_or_404
 
 
 class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -120,21 +121,59 @@ class HotelAllReservationListView(generics.ListAPIView):
         return Appointment.objects.filter(doctor_id=self.kwargs['pk'])
 
 
-class HotelSearchByLocationDate(APIView):
+class HotelSearchByLocation(APIView):
     permission_classes = []
     authentication_classes = []
     pagination_class = StandardResultsSetPagination
 
     def post(self, request, format=None):
-        query = SearchByLocationSpecialtySerializer(data=request.data)
+        query = HotelSearchByLocationSerializer(data=request.data)
         query.is_valid(raise_exception=True)
-        related_doctors = Doctor.objects.all()
+        related_hotels = Hotel.objects.all()
         if 'lat' in query.data.keys() and 'long' in query.data.keys():
             lat = float(query.data['lat'])
             long = float(query.data['long'])
-            related_doctors = related_doctors.filter(location__distance_lt=(Point(lat, long), Distance(m=5000)))
-        if 'specialties' in query.data.keys():
-            specialties = query.data['specialties']
-            related_doctors = related_doctors.filter(specialties__in=specialties)
-        serialized_doctors = DoctorListSerializer(related_doctors, many=True)
-        return Response(serialized_doctors.data)
+            related_hotels = related_hotels.filter(location__distance_lt=(Point(lat, long), Distance(m=5000)))
+
+        serialized_hotels = HotelListSerializer(related_hotels, many=True)
+        return Response(serialized_hotels.data)
+
+
+class HotelAvailableRooms(generics.ListAPIView):
+    permission_classes = []
+    authentication_classes = []
+    pagination_class = StandardResultsSetPagination
+    serializer_class = RoomSerializer
+    
+    def get_queryset(self):
+        result = []
+        print("-------------------------")
+        self.hotel = get_object_or_404(Hotel, pk=self.kwargs['pk'])
+        print(self.hotel)
+
+        self.from_date = self.kwargs['from']
+        print(self.from_date)
+        self.to_date = self.kwargs['to']
+        rooms_of_hotel = Room.objects.filter(hotel=self.hotel)
+
+        for room in rooms_of_hotel:
+            reserves_of_room = HotelReservation.objects.filter(hotel_room=room)
+            case_1 = reserves_of_room.filter(to_date__gt=self.from_date, to_date__lte=self.to_date).count()
+            print(case_1)             
+            
+            # --------start_requested-----(----end_requested----)
+            case_2 = reserves_of_room.filter(from_date__lt=self.to_date, from_date__gte=self.from_date).count()
+            print(case_2)
+
+            # ----(---start_requested----------end_requested----)
+            case_3 = reserves_of_room.filter(from_date__lt=self.from_date, to_date__gt=self.to_date).count()
+            print(case_3)
+
+            case_4 = reserves_of_room.filter(from_date__gte= self.from_date, to_date__lte=self.to_date).count()
+            print(case_4)
+
+            number_of_reserved = case_1 + case_2 + case_3 - case_4
+            if number_of_reserved < room.quantity:
+                result.append(room)
+
+        return result

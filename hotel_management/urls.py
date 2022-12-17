@@ -1,11 +1,15 @@
-from django.urls import path, include
+from django.urls import path, include, register_converter
 from rest_framework import routers
 from rest_framework.routers import DefaultRouter
 
 from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView, RoomListCreateView, \
     HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView, HotelOwnerUpdateView, \
-    HotelOwnerCreateView, HotelOwnerHotelsListView, HotelReservationModelViewSet, HotelAllReservationListView
+    HotelOwnerCreateView, HotelOwnerHotelsListView, HotelReservationModelViewSet, HotelAllReservationListView, \
+    HotelSearchByLocation, HotelAvailableRooms
 
+from .converters import DateConverter
+
+register_converter(DateConverter, 'date')
 
 app_name = 'hotel_management'
 hotel_reserve_router = DefaultRouter()
@@ -34,6 +38,8 @@ urlpatterns = [
     # hotel reserve endpoints
     path('hotel_reserve/', include(hotel_reserve_router.urls)),
     path('<int:pk>/hotel_reserve/', HotelAllReservationListView.as_view()),
+    path('<int:pk>/<date:from>/<date:to>/available_rooms', HotelAvailableRooms.as_view()),
 
+    # search endpoint
+    path('search/', HotelSearchByLocation.as_view()),
 ]
-
