@@ -187,6 +187,8 @@ class HotelAvailableRooms(generics.ListAPIView):
 
         for room in rooms_of_hotel:
             reserves_of_room = HotelReservation.objects.filter(hotel_room=room)
+
+            # ----(---start_requested---)------end_requested-----
             case_1 = reserves_of_room.filter(to_date__gt=self.from_date, to_date__lte=self.to_date).count()
 
             # --------start_requested-----(----end_requested----)
