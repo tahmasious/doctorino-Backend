@@ -147,7 +147,8 @@ class HotelAllReservationListView(generics.ListAPIView):
             raise ValidationError({
                 "error" :  "هتلی با این آیدی به ثبت نرسیده."
             })
-        return HotelReservation.objects.filter(doctor_id=self.kwargs['pk'])
+        
+        return HotelReservation.objects.filter(hotel_room__hotel_id=self.kwargs['pk'])
 
 
 class HotelSearchByLocation(APIView):

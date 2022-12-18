@@ -46,7 +46,7 @@ class Hotel(models.Model):
 
 
 class Room(models.Model):
-    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='hotel')
     quantity = models.IntegerField(default=1, blank=True)
     bed_count = models.SmallIntegerField(default=1, blank=True)
     price_per_night = models.PositiveIntegerField(null=True)

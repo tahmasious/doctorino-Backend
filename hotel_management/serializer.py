@@ -259,14 +259,14 @@ class HotelReserveSerializer(serializers.ModelSerializer):
 
 
 class DetailedHotelReservationSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
+    customer = serializers.SerializerMethodField()
 
     class Meta:
         model = HotelReservation
         fields = "__all__"
 
-    def get_user(self, obj):
-        return UserListSerializer(obj.user).data
+    def get_customer(self, obj):
+        return UserListSerializer(obj.customer).data
 
 
 class HotelSearchByLocationSerializer(serializers.Serializer):
