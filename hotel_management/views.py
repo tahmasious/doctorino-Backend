@@ -20,7 +20,7 @@ from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, H
 from utils.permissions import IsHotelOwnerOrReadOnly
 from doctorino.pagination import StandardResultsSetPagination
 from django.shortcuts import get_object_or_404
-
+import datetime
 
 class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Hotel.objects.all()
@@ -180,6 +180,21 @@ class HotelAvailableRooms(generics.ListAPIView):
         self.hotel = get_object_or_404(Hotel, pk=self.kwargs['pk'])
         self.from_date = self.kwargs['from']
         self.to_date = self.kwargs['to']
+
+        errs = {}
+
+        if self.from_date < datetime.date.today():
+            errs['before today'] = ['نمیتوان برای قبل از امروز رزرو کرد.']
+            raise ValidationError(errs)
+
+        if self.from_date > self.to_date:
+            errs['start after end'] = ['تاریخ اتمام رزرو نمیتواند قبل از تاریخ شروع آن باشد.']
+            raise ValidationError(errs)
+
+        if self.from_date == self.to_date:
+            errs['start equal to end'] = ['تاریخ شروع روزر و پایان آن نباید برابر باشد']
+            raise ValidationError(errs)
+    
         rooms_of_hotel = Room.objects.filter(hotel=self.hotel)
 
         for room in rooms_of_hotel:

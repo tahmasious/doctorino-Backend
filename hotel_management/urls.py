@@ -42,7 +42,7 @@ urlpatterns = [
     # hotel reserve endpoints
     path('hotel_reserve/', include(hotel_reserve_router.urls)),
     path('<int:pk>/hotel_reserve/', HotelAllReservationListView.as_view()),
-    path('<int:pk>/<date:from>/<date:to>/available_rooms', HotelAvailableRooms.as_view()),
+    path('<int:pk>/<date:from>/<date:to>/available_rooms/', HotelAvailableRooms.as_view()),
 
     # search endpoint
     path('search/', HotelSearchByLocation.as_view()),

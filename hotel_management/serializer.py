@@ -162,7 +162,7 @@ class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ('id', 'hotel', 'quantity', 'bed_count', 'price_per_night', 'images')
+        fields = ('id', 'hotel', 'quantity', 'bed_count', 'price_per_night', 'images', 'room_title')
 
 
     def get_images(self, obj):
