@@ -41,6 +41,9 @@ class HotelOwnerCreateSerializer(serializers.ModelSerializer):
         user_serialized = UserSerializer(data=user_data)
         user_serialized.is_valid(raise_exception=True)
         user = user_serialized.save()
+        user.is_hotel_owner = True
+        user.save()
+
         hotel_owner = HotelOwner.objects.create(user=user, **validated_data)
         return hotel_owner
 

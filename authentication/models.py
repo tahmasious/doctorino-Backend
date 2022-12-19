@@ -13,5 +13,5 @@ class User(AbstractUser):
 
 
 class HotelOwner(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='owner')
     shaba_code = models.CharField(max_length=256, null=True, blank=True)

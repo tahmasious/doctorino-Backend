@@ -73,7 +73,9 @@ class DoctorCreateSerializer(serializers.ModelSerializer):
         user_serialized = UserSerializer(data=user_data)
         user_serialized.is_valid(raise_exception=True)
         user = user_serialized.save()
-        
+        user.is_doctor = True
+        user.save()
+
         doctor = Doctor.objects.create(user=user, **validated_data)
         for spec in specialty_list:
             doctor.specialties.add(spec)
