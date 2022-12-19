@@ -102,7 +102,7 @@ class HotelOwnerHotelsListView(generics.ListAPIView):
         if not (self.request.user.is_hotel_owner or self.request.user.is_superuser) :
             context = {'user' : ['شما دسترسی برای دیدن هتل ها ندارید !']}
             raise ValidationError(detail=context)
-        hotel_owner_id = self.request.user.owner.filter().last().id
+        hotel_owner_id = self.request.user.owner.id
         return Hotel.objects.filter(hotel_owner_id=hotel_owner_id)
 
 

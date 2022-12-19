@@ -25,7 +25,7 @@ class Hotel(models.Model):
     hotel_description = models.CharField(max_length=1024, blank=True, null=True)
     address = models.CharField(max_length=256, null=True)
     cover_image = models.ImageField(upload_to='hotel-images', null=True, blank=True, default=get_default_hotel_image_cover)
-    rules = models.CharField(max_length=256, blank=True, null=True)
+    rules = models.TextField(blank=True, null=True)
     is_active = models.BooleanField(default=False)
     features = models.ManyToManyField(Feature, related_name="features", blank=True, null=True)
     phone_number = models.CharField(max_length=11, blank=False, null=True)
