@@ -4,7 +4,7 @@ from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
 
 class HotelAdmin(admin.ModelAdmin):
-    list_display = ("hotel_owner", "trade_code", "hotel_name", "hotel_stars", "is_active")
+    list_display = ("hotel_owner", "trade_code", "hotel_name", "hotel_stars", "is_active", "city")
     list_filter = ("hotel_owner", "hotel_name")
 
     class Meta:
