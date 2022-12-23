@@ -1,7 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt import views as jwt_views
-from authentication.views import UserCreationView
 from rest_framework import routers
 from .views import (DoctorListView, DoctorCreateView,
                     DoctorRetrieveUpdateDestroyView, SpecialtyListView,

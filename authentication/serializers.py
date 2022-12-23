@@ -51,3 +51,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data.update({'last-name' : self.user.last_name})
         # and everything else you want to send in the response
         return data
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email", "birth_day")
