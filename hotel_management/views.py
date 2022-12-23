@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from authentication.models import HotelOwner
+from authentication.models import HotelOwner, User
 from doctorino.pagination import StandardResultsSetPagination
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview, HotelImage
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
@@ -217,3 +217,16 @@ class HotelAvailableRooms(generics.ListAPIView):
                 result.append(room)
 
         return result
+
+
+class UserHotelReservations(generics.ListAPIView):
+    permission_classes = []
+    authentication_classes = []
+    pagination_class = StandardResultsSetPagination
+    serializer_class = HotelReserveSerializer
+
+    def get_queryset(self):
+        result = []
+        self.user = get_object_or_404(User, pk=self.kwargs['pk'])
+        return HotelReservation.objects.filter(customer=self.user)
+        
