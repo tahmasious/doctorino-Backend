@@ -17,8 +17,8 @@ class UserModelViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return UserListSerializer
-        if self.action == 'retrieve':
-            return UserProfileSerializer
+        # if self.action == 'retrieve':
+        #     return UserProfileSerializer
         return UserSerializer
 
 # class UserCreationView(generics.CreateAPIView):
