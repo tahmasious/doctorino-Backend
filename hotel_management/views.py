@@ -17,7 +17,7 @@ from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, H
     HotelReviewSerializer, HotelImageSerializer, \
     FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer,\
     HotelReserveSerializer, DetailedHotelReservationSerializer, HotelSearchByLocationSerializer
-from utils.permissions import IsHotelOwnerOrReadOnly
+from utils.permissions import IsHotelOwnerOrReadOnly, HasHotelOwnerRole
 from doctorino.pagination import StandardResultsSetPagination
 from django.shortcuts import get_object_or_404
 import datetime
@@ -27,12 +27,10 @@ class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = HotelDetailSerializer
     permission_classes = []
 
-    def get_permissions(self): # Retrieve and list don't need authentication, others need
+    def get_permissions(self):  # list doesn't need authentication, others need
         if self.request.method != "GET":
             return [IsAuthenticated(), IsHotelOwnerOrReadOnly()]
-        else:
-            return []
-        return [permission() for permission in self.permission_classes]
+        return []
 
 
 class HotelListView(generics.ListAPIView):
@@ -44,7 +42,7 @@ class HotelListView(generics.ListAPIView):
 class HotelCreateView(generics.CreateAPIView):
     queryset = Hotel.objects.filter(is_active=True)
     serializer_class = HotelCreateSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, HasHotelOwnerRole]
 
 
 class RoomRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -64,6 +62,10 @@ class RoomListCreateView(generics.ListCreateAPIView):
     queryset = Room.objects.all()
     pagination_class = StandardResultsSetPagination
 
+    def get_permissions(self):  # list doesn't need authentication, others need
+        if self.request.method != "GET":
+            return [IsAuthenticated()]
+        return []
 
 class HotelRoomsListView(generics.ListAPIView):
     serializer_class = RoomSerializer
@@ -124,12 +126,13 @@ class HotelReviewListCreateView(generics.ListCreateAPIView):
 class HotelImageCreateView(generics.CreateAPIView):
     serializer_class = HotelImageSerializer
     queryset = HotelImage.objects.all()
+    permission_classes = [IsAuthenticated, HasHotelOwnerRole]
 
 
 class HotelImageDestroyView(generics.DestroyAPIView):
     serializer_class = HotelImageSerializer
     queryset = HotelImage.objects.all()
-
+    permission_classes = [IsAuthenticated, HasHotelOwnerRole]
 
 
 class HotelReservationModelViewSet(ModelViewSet):

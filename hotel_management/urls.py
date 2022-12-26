@@ -18,37 +18,37 @@ hotel_reserve_router = DefaultRouter()
 hotel_reserve_router.register(r'', HotelReservationModelViewSet, basename="hotel_reserve")
 
 urlpatterns = [
-    # Hotel urls
-    path('<int:pk>/', HotelRetrieveUpdateDestroyView.as_view()),
-    path('', HotelListView.as_view()),
-    path('new/', HotelCreateView.as_view()),
-    path('<int:pk>/room/', HotelRoomsListView.as_view()),
-    path('image/', HotelImageCreateView.as_view()),
-    path('image/<int:pk>/', HotelImageDestroyView.as_view()),
+    # Hotel urls                                                  # permissions
+    path('<int:pk>/', HotelRetrieveUpdateDestroyView.as_view()),  #@ retrieve : all, update and destroy : only obj owner
+    path('', HotelListView.as_view()),                            #@ all
+    path('new/', HotelCreateView.as_view()),                      #@ only hotel owner
+    path('<int:pk>/room/', HotelRoomsListView.as_view()),         #@ all
+    path('image/', HotelImageCreateView.as_view()),               #@ the hotel obj owner
+    path('image/<int:pk>/', HotelImageDestroyView.as_view()),     #@ the hotel obj owner
 
     # Room urls
-    path('room/', RoomListCreateView.as_view()),
-    path('room/<int:pk>/', RoomRetrieveUpdateDestroyView.as_view()),
-    path('room/image/', HotelRoomImageCreateView.as_view()),
+    path('room/', RoomListCreateView.as_view()),                  # all
+    path('room/<int:pk>/', RoomRetrieveUpdateDestroyView.as_view()),  # room retrieve : all , others : owner obj
+    path('room/image/', HotelRoomImageCreateView.as_view()),      # only hotel room obj owner
 
     # Features urls
-    path('feature/', FeatureListView.as_view()),
+    path('feature/', FeatureListView.as_view()),                  # all
 
     # owner urls
-    path('owner/<int:pk>/', HotelOwnerUpdateView.as_view()),          # update and retrieve
-    path('owner/new/', HotelOwnerCreateView.as_view()),               # create new hotel owner
-    path('owner/hotel-list/', HotelOwnerHotelsListView.as_view()),
+    path('owner/<int:pk>/', HotelOwnerUpdateView.as_view()),      # hotel owner obj
+    path('owner/new/', HotelOwnerCreateView.as_view()),           # all
+    path('owner/hotel-list/', HotelOwnerHotelsListView.as_view()),# all
 
     # hotel reserve endpoints
-    path('hotel_reserve/', include(hotel_reserve_router.urls)),
-    path('<int:pk>/hotel_reserve/', HotelAllReservationListView.as_view()),
-    path('<int:pk>/<date:from>/<date:to>/available_rooms/', HotelAvailableRooms.as_view()),
+    path('hotel_reserve/', include(hotel_reserve_router.urls)),                              # all
+    path('<int:pk>/hotel_reserve/', HotelAllReservationListView.as_view()),                  # all
+    path('<int:pk>/<date:from>/<date:to>/available_rooms/', HotelAvailableRooms.as_view()),  # all
 
     # search endpoint
-    path('search/', HotelSearchByLocation.as_view()),
+    path('search/', HotelSearchByLocation.as_view()),             # all
 
     # hotel reviews
-    path('reviews/', HotelReviewListCreateView.as_view()),
-    path('<int:pk>/reviews/', HotelReviewListCreateView.as_view())
+    path('reviews/', HotelReviewListCreateView.as_view()),        # list : all , create : logged in user only
+    path('<int:pk>/reviews/', HotelReviewListCreateView.as_view())# list : all , create : logged in user only
 ]
 

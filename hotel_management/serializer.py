@@ -161,7 +161,10 @@ class HotelRoomImagesSerializer(serializers.ModelSerializer):
 
 
 class RoomSerializer(serializers.ModelSerializer):
-    images = ReadWriteSerializerMethodField()
+    images = serializers.SerializerMethodField()
+
+    def validate(self, attrs):
+        print(self.context['request'])
 
     class Meta:
         model = Room
@@ -174,14 +177,7 @@ class RoomSerializer(serializers.ModelSerializer):
         return serialized_images.data
 
     def create(self, validated_data):
-        if validated_data['hotel']:
-            hotel = validated_data['hotel']
-        else:
-            hotel = self.context['request'].user.hotel
-        new_room = Room.objects.create(hotel=hotel,
-                                       quantity=validated_data['quantity'],
-                                       bed_count=validated_data['bed_count'],
-                                       price_per_night=validated_data['price_per_night'])
+        new_room = Room.objects.create(**validated_data)
         new_room.save()
 
         if "images" in validated_data :
@@ -283,6 +279,16 @@ class HotelReviewSerializer(serializers.ModelSerializer):
 
 
 class HotelImageSerializer(serializers.ModelSerializer):
+
+    def validate(self, attrs):
+        errs =dict()
+        data = super(HotelImageSerializer, self).validate(attrs)
+        if data['hotel'].hotel_owner != self.context['request'].user.owner:
+            errs['error'] = ['شما فقط برای هتل خودتان می توانید عکس انتخاب کنید !']
+        if errs:
+            raise serializers.ValidationError(errs)
+        return data
+
     class Meta:
         model = HotelImage
         fields = "__all__"
