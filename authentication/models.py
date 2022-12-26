@@ -43,3 +43,6 @@ class HotelOwner(models.Model):
     telephone_number = models.CharField(max_length=20, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     birth_day = jmodels.jDateField(blank=False, null=True)
+
+    def __str__(self):
+        return f"{self.user.email}"
