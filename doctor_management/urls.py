@@ -1,13 +1,12 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt import views as jwt_views
-from authentication.views import UserCreationView
 from rest_framework import routers
 from .views import (DoctorListView, DoctorCreateView,
                     DoctorRetrieveUpdateDestroyView, SpecialtyListView,
                     user_id_to_doctor_id, DoctorSearchByLocationSpecialty, WorkDayPeriodModelViewSet,
                     AppointmentModelViewSet, DoctorAllWorkDaysListView, DoctorAllAppointmentsInProfilePageListView,
-                    DetailedDoctorAllAppointmentsListView, DoctorReviewListCreateView)
+                    DetailedDoctorAllAppointmentsListView, DoctorReviewListCreateView, UserDoctorAppoinments)
 
 
 app_name = 'doctor_management'
@@ -40,6 +39,7 @@ urlpatterns = [
 
     # doctor review endpoints
     path('reviews/', DoctorReviewListCreateView.as_view()),
-    path('<int:pk>/reviews/', DoctorReviewListCreateView.as_view())
+    path('<int:pk>/reviews/', DoctorReviewListCreateView.as_view()),
+    path('<int:pk>/user_appoinments/', UserDoctorAppoinments.as_view()),
 
 ]

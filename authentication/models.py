@@ -3,10 +3,22 @@ from django.contrib.auth.models import AbstractUser
 from django_jalali.db import models as jmodels
 
 class User(AbstractUser):
+    GENDER_CHOICES = (
+        (0, 'male'),
+        (1, 'female'),
+        (2, 'not specified'),
+    )
+
     username = models.CharField(max_length=120, unique=True, blank=False, null=True)
     is_hotel_owner = models.BooleanField(default=False, blank=True, null=True)
     is_doctor = models.BooleanField(default=False, blank=True, null=True)
     email = models.EmailField(unique=True, blank=False)
+
+    ####################
+    gender = models.IntegerField(choices=GENDER_CHOICES, default=2)
+    code_melli = models.CharField(max_length=10, unique=True, blank=False, null=True)
+    phone_number = models.CharField(max_length=11, blank=False, null=True)
+    birth_day = jmodels.jDateField(blank=False, null=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

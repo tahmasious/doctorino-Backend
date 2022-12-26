@@ -19,6 +19,7 @@ from rest_framework.response import Response
 from doctorino.pagination import StandardResultsSetPagination
 from django.http import HttpResponse
 import json
+from django.shortcuts import get_object_or_404
 
 class DoctorListView(generics.ListAPIView):
     queryset = Doctor.objects.filter(is_active=True)
@@ -140,3 +141,16 @@ class DoctorReviewListCreateView(generics.ListCreateAPIView):
                 "error": "دکتری با این آیدی به ثبت نرسیده."
             })
         return DoctorReview.objects.filter(doctor_id=self.kwargs['pk'])
+
+
+class UserDoctorAppoinments(generics.ListAPIView):
+    permission_classes = []
+    authentication_classes = []
+    pagination_class = StandardResultsSetPagination
+    serializer_class = AppointmentSerializer
+
+    def get_queryset(self):
+        result = []
+        self.user = get_object_or_404(User, pk=self.kwargs['pk'])
+        return Appointment.objects.filter(patient=self.user)
+        

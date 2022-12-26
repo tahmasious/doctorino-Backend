@@ -7,7 +7,7 @@ from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView
     HotelOwnerCreateView, HotelReviewListCreateView, HotelImageCreateView, \
     HotelImageDestroyView, \
     HotelOwnerHotelsListView, HotelReservationModelViewSet, HotelAllReservationListView, \
-    HotelSearchByLocation, HotelAvailableRooms
+    HotelSearchByLocation, HotelAvailableRooms, UserHotelReservations
 
 from .converters import DateConverter
 
@@ -49,6 +49,11 @@ urlpatterns = [
 
     # hotel reviews
     path('reviews/', HotelReviewListCreateView.as_view()),        # list : all , create : logged in user only
-    path('<int:pk>/reviews/', HotelReviewListCreateView.as_view())# list : all , create : logged in user only
+    path('<int:pk>/reviews/', HotelReviewListCreateView.as_view()),# list : all , create : logged in user only
+    path('reviews/', HotelReviewListCreateView.as_view()),
+    path('<int:pk>/reviews/', HotelReviewListCreateView.as_view()),
+
+
+    path('<int:pk>/user_reservations/', UserHotelReservations.as_view()),
 ]
 
