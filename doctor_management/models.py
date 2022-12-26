@@ -39,7 +39,7 @@ class Doctor(models.Model):
     description = models.TextField(max_length=7000, null=True, blank=True)
 
     def __str__(self):
-        return self.user.first_name + " " + self.user.last_name
+        return self.user.email
 
     @property
     def rate(self):

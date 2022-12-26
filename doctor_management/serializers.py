@@ -150,7 +150,7 @@ class DetailedAppointmentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_user(self, obj):
-        return UserListSerializer(obj.user).data
+        return UserListSerializer(obj.patient).data
 
 
 class DoctorReviewSerializer(serializers.ModelSerializer):

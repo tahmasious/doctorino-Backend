@@ -13,7 +13,7 @@ from .serializers import (DoctorDetailSerializer, DoctorListSerializer,
                           WorkDayPeriodSerializer, AppointmentSerializer, DetailedAppointmentSerializer,
                           DoctorReviewSerializer)
 from django.contrib.gis.geos import Point
-from utils.permissions import IsDoctorOrReadOnly
+from utils.permissions import IsDoctorOrReadOnly, IsWorkDayOwnerOrReadOnly, IsAppointmentOwnerOrReadOnly
 from django.db import transaction
 from rest_framework.response import Response
 from doctorino.pagination import StandardResultsSetPagination
@@ -25,11 +25,13 @@ class DoctorListView(generics.ListAPIView):
     queryset = Doctor.objects.filter(is_active=True)
     pagination_class = StandardResultsSetPagination
     serializer_class = DoctorListSerializer
+    authentication_classes = []
 
 
 class DoctorCreateView(generics.CreateAPIView):
     queryset = Doctor.objects.filter(is_active=True)
     serializer_class = DoctorCreateSerializer
+    authentication_classes = []
 
 
 class DoctorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -37,18 +39,17 @@ class DoctorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DoctorDetailSerializer
     permission_classes = []
 
-    def get_permissions(self): # Retrieve and list don't need authentication, others need
+    def get_permissions(self):  # list doesn't need authentication, others need
         if self.request.method != "GET":
             return [IsAuthenticated(), IsDoctorOrReadOnly()]
-        else:
-            return []
-        return [permission() for permission in self.permission_classes]
+        return []
 
 
 class SpecialtyListView(generics.ListAPIView):
     serializer_class = SpecialtySerializer
     queryset = Specialty.objects.all()
     pagination_class = StandardResultsSetPagination
+    authentication_classes = []
 
 
 def user_id_to_doctor_id(request, **kwargs):
@@ -62,9 +63,8 @@ def user_id_to_doctor_id(request, **kwargs):
 
 
 class DoctorSearchByLocationSpecialty(APIView):
-    permission_classes = []
-    authentication_classes = []
     pagination_class = StandardResultsSetPagination
+    authentication_classes = []
 
     def post(self, request, format=None):
         serialized_input = SearchByLocationSpecialtySerializer(data=request.data)
@@ -86,6 +86,14 @@ class WorkDayPeriodModelViewSet(ModelViewSet):
     queryset = WorkDayPeriod.objects.all()
     pagination_class = StandardResultsSetPagination
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return []
+        elif self.request.method == "POST":
+            return [IsAuthenticated()]
+        else:
+            return [IsAuthenticated(), IsWorkDayOwnerOrReadOnly()]
+
 
 class DoctorAllWorkDaysListView(generics.ListAPIView):
     serializer_class = WorkDayPeriodSerializer
@@ -103,6 +111,15 @@ class AppointmentModelViewSet(ModelViewSet):
     serializer_class = AppointmentSerializer
     queryset = Appointment.objects.all()
     pagination_class = StandardResultsSetPagination
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return []
+        elif self.request.method == "POST":
+            return [IsAuthenticated()]
+        else:
+            return [IsAuthenticated(), IsAppointmentOwnerOrReadOnly()]
+
 
 class DoctorAllAppointmentsInProfilePageListView(generics.ListAPIView):  # Patients data is not going to be send !
     serializer_class = AppointmentSerializer
@@ -131,6 +148,11 @@ class DetailedDoctorAllAppointmentsListView(generics.ListAPIView):  # include pa
 class DoctorReviewListCreateView(generics.ListCreateAPIView):
     serializer_class = DoctorReviewSerializer
     pagination_class = StandardResultsSetPagination
+
+    def get_permissions(self):
+        if self.request.method != "GET":
+            return [IsAuthenticated()]
+        return []
 
     def get_queryset(self):
         if 'pk' not in self.kwargs:
