@@ -1,26 +1,27 @@
-from django.db import transaction
-from rest_framework import generics, status
-from rest_framework import viewsets
-from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
+import datetime
+
+from django.contrib.gis.geos import Point
+from django.contrib.gis.measure import Distance
+from django.shortcuts import get_object_or_404
+from rest_framework import generics
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from authentication.models import HotelOwner, User
 from doctorino.pagination import StandardResultsSetPagination
-from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview, HotelImage
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
+from hotel_management.models import HotelReview, HotelImage
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
-    FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer, \
     HotelReviewSerializer, HotelImageSerializer, \
-    FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer,\
+    FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer, \
     HotelReserveSerializer, DetailedHotelReservationSerializer, HotelSearchByLocationSerializer
-from utils.permissions import IsHotelOwnerOrReadOnly, HasHotelOwnerRole
-from doctorino.pagination import StandardResultsSetPagination
-from django.shortcuts import get_object_or_404
-import datetime
+from utils.permissions import IsHotelOwnerOrReadOnly, HasHotelOwnerRole, IsRoomOwnerOrReadOnly, IsOwnerOrReadOnly, \
+    IsHotelReserveOwnerOrReadOnly
+
 
 class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Hotel.objects.all()
@@ -50,12 +51,10 @@ class RoomRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Room.objects.all()
     permission_classes = []
 
-    def get_permissions(self): # Retrieve and list don't need authentication, others need
+    def get_permissions(self):
         if self.request.method != "GET":
-            return [IsAuthenticated(), IsHotelOwnerOrReadOnly()]
-        else:
-            return []
-        return [permission() for permission in self.permission_classes]
+            return [IsAuthenticated(), IsRoomOwnerOrReadOnly()]
+        return []
 
 class RoomListCreateView(generics.ListCreateAPIView):
     serializer_class = RoomSerializer
@@ -77,7 +76,7 @@ class HotelRoomsListView(generics.ListAPIView):
 class HotelRoomImageCreateView(generics.CreateAPIView):
     serializer_class = HotelRoomImagesSerializer
     queryset = RoomImage.objects.all()
-
+    permission_classes = [HasHotelOwnerRole]
 
 class FeatureListView(generics.ListAPIView):
     serializer_class = FeatureSerializer
@@ -88,12 +87,11 @@ class FeatureListView(generics.ListAPIView):
 class HotelOwnerUpdateView(generics.RetrieveUpdateAPIView):
     queryset = HotelOwner.objects.all()
     serializer_class = HotelOwnerUpdateRetrieveSerializer
-
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
 class HotelOwnerCreateView(generics.CreateAPIView):
     queryset = HotelOwner.objects.all()
     serializer_class = HotelOwnerCreateSerializer
-    permission_classes = []
 
 
 class HotelOwnerHotelsListView(generics.ListAPIView):
@@ -111,6 +109,11 @@ class HotelOwnerHotelsListView(generics.ListAPIView):
 class HotelReviewListCreateView(generics.ListCreateAPIView):
     serializer_class = HotelReviewSerializer
     pagination_class = StandardResultsSetPagination
+
+    def get_permissions(self):
+        if self.request.method != "GET":
+            return [IsAuthenticated()]
+        return []
 
     def get_queryset(self):
         if 'pk' not in self.kwargs:
@@ -140,6 +143,14 @@ class HotelReservationModelViewSet(ModelViewSet):
     queryset = HotelReservation.objects.all()
     pagination_class = StandardResultsSetPagination
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return []
+        elif self.request.method == "POST":
+            return [IsAuthenticated()]
+        else:
+            return [IsAuthenticated(), IsHotelReserveOwnerOrReadOnly()]
+
 
 class HotelAllReservationListView(generics.ListAPIView):
     serializer_class = DetailedHotelReservationSerializer
@@ -155,8 +166,6 @@ class HotelAllReservationListView(generics.ListAPIView):
 
 
 class HotelSearchByLocation(APIView):
-    permission_classes = []
-    authentication_classes = []
     pagination_class = StandardResultsSetPagination
 
     def post(self, request, format=None):
@@ -173,8 +182,6 @@ class HotelSearchByLocation(APIView):
 
 
 class HotelAvailableRooms(generics.ListAPIView):
-    permission_classes = []
-    authentication_classes = []
     pagination_class = StandardResultsSetPagination
     serializer_class = RoomSerializer
 

@@ -13,7 +13,10 @@ class HotelAdmin(admin.ModelAdmin):
 admin.site.register(Hotel, HotelAdmin)
 
 
-admin.site.register(Room)
+class HotelRoomAdmin(admin.ModelAdmin):
+    list_display = ("hotel", "quantity", "bed_count")
+admin.site.register(Room, HotelRoomAdmin)
+
 admin.site.register(RoomImage)
 admin.site.register(Feature)
 admin.site.register(HotelReservation)

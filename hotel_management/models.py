@@ -3,8 +3,8 @@ from django.db import models
 from authentication.models import User, HotelOwner
 from django.core.exceptions import ValidationError
 from django_jalali.db import models as jmodels
-from django.core.exceptions import ValidationError
-
+from django.contrib.gis.db import models as lcmodels
+from django.contrib.gis.geos import Point
 CITY_CHOICES = (
     (0,"تعیین نشده"),
     (1,"آذربایجان شرقی",),
@@ -64,6 +64,7 @@ class Hotel(models.Model):
     features = models.ManyToManyField(Feature, related_name="features", blank=True, null=True)
     phone_number = models.CharField(max_length=11, blank=False, null=True)
     city = models.IntegerField(choices=CITY_CHOICES, blank=False, null=True, default=0)
+    location = lcmodels.PointField(geography=True, default=Point(0.0, 0.0))
 
     def __str__(self):
         return self.hotel_name
@@ -91,7 +92,7 @@ class Room(models.Model):
 
 class RoomImage(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='room-images', blank=True, null=True)
+    image = models.ImageField(upload_to='room-images', blank=False, null=True)
     is_thumbnail = models.BooleanField(default=False, blank=True, null=True)
     is_cover = models.BooleanField(default=False, blank=True, null=True)
 

@@ -115,12 +115,14 @@ class HotelCreateSerializer(serializers.ModelSerializer):
         else:
             user_id = self.context['request'].user.id
             hotel_owner_id = HotelOwner.objects.filter(user_id=user_id).last().id
-
+        feature_list = None
         if 'features' in validated_data.keys():
             feature_list = validated_data.pop('features')
+            print(feature_list)
         hotel = Hotel.objects.create(hotel_owner_id=hotel_owner_id, **validated_data)
-        if 'features' in validated_data.keys():
+        if feature_list:
             for feature in feature_list:
+                print(feature)
                 hotel.features.add(feature)
         hotel.save()
         return hotel
@@ -148,24 +150,36 @@ class HotelListSerializer(serializers.ModelSerializer):
 
 class HotelRoomImagesSerializer(serializers.ModelSerializer):
 
+    def validate(self, attrs):
+        errs = dict()
+        data = super(HotelRoomImagesSerializer, self).validate(attrs)
+        if self.context['request'].method == "POST":
+            if data['room'].hotel.hotel_owner.user != self.context['request'].user:
+                errs['room'] = ['شما فقط به اتاق های خود می توانید عکس اضافه کنید !']
+        if errs:
+            raise serializers.ValidationError(errs)
+        return data
     class Meta:
         model = RoomImage
         fields = '__all__'
 
     def create(self, validated_data):
-        new_image_room = RoomImage.objects.create(is_cover=validated_data['is_cover'],
-                                                  is_thumbnail=validated_data['is_cover'],
-                                                  image=validated_data['image'],
-                                                  room=validated_data['room'])
+        new_image_room = RoomImage.objects.create(**validated_data)
         return new_image_room
 
 
 class RoomSerializer(serializers.ModelSerializer):
-    images = serializers.SerializerMethodField()
+    images = ReadWriteSerializerMethodField()
 
     def validate(self, attrs):
-        print(self.context['request'])
-
+        errs = dict()
+        data = super(RoomSerializer, self).validate(attrs)
+        if self.context['request'].method == 'POST':
+            if data['hotel'].hotel_owner != self.context['request'].user.owner:
+                errs['hotel'] = ['شما فقط برای هتل خود می توانید اتاق اضافه کنید !']
+        if errs:
+            raise serializers.ValidationError(errs)
+        return data
     class Meta:
         model = Room
         fields = ('id', 'hotel', 'quantity', 'bed_count', 'price_per_night', 'images', 'room_title')
@@ -177,11 +191,12 @@ class RoomSerializer(serializers.ModelSerializer):
         return serialized_images.data
 
     def create(self, validated_data):
+        if "images" in validated_data:
+            images = validated_data.pop('images')
         new_room = Room.objects.create(**validated_data)
         new_room.save()
 
         if "images" in validated_data :
-            images = validated_data['images']
             for image in images:
                 RoomImage.objects.create(room=new_room,
                                          image=image['image'],
