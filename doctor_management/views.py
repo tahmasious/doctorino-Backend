@@ -175,7 +175,6 @@ class UserDoctorAppoinments(generics.ListAPIView):
     serializer_class = AppointmentSerializer
 
     def get_queryset(self):
-        result = []
         self.user = get_object_or_404(User, pk=self.kwargs['pk'])
         return Appointment.objects.filter(patient=self.user)
         

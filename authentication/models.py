@@ -14,12 +14,6 @@ class User(AbstractUser):
     is_doctor = models.BooleanField(default=False, blank=True, null=True)
     email = models.EmailField(unique=True, blank=False)
 
-    ####################
-    gender = models.IntegerField(choices=GENDER_CHOICES, default=2)
-    code_melli = models.CharField(max_length=10, unique=True, blank=False, null=True)
-    phone_number = models.CharField(max_length=11, blank=False, null=True)
-    birth_day = jmodels.jDateField(blank=False, null=True)
-
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
@@ -46,3 +40,13 @@ class HotelOwner(models.Model):
 
     def __str__(self):
         return f"{self.user.email}"
+
+
+class Patient(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='patient')
+    gender = models.IntegerField(choices=GENDER_CHOICES, default=2)
+    code_melli = models.CharField(max_length=10, unique=True, blank=False, null=True)
+    phone_number = models.CharField(max_length=11, blank=False, null=True)
+    birth_day = jmodels.jDateField(blank=False, null=True)
+    province = models.CharField(max_length=50, blank=False, null=True)
+    city = models.IntegerField(max_length=50, blank=False, null=True)
