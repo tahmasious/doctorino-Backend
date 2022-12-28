@@ -5,40 +5,8 @@ from django.core.exceptions import ValidationError
 from django_jalali.db import models as jmodels
 from django.contrib.gis.db import models as lcmodels
 from django.contrib.gis.geos import Point
-CITY_CHOICES = (
-    (0,"تعیین نشده"),
-    (1,"آذربایجان شرقی",),
-    (2,"آذربایجان غربی",),
-    (3,"اردبیل",),
-    (4,"اصفهان",),
-    (5,"البرز",),
-    (6,"ایلام",),
-    (7,"بوشهر",),
-    (8,"تهران",),
-    (9,"چهارمحال و بختیاری",),
-    (10,"خراسان جنوبی",),
-    (11,"خراسان رضوی",),
-    (12,"خراسان شمالی",),
-    (13,"خوزستان",),
-    (14,"زنجان",),
-    (15,"سمنان",),
-    (16,"سیستان و بلوچستان",),
-    (17,"فارس",),
-    (18,"قزوین",),
-    (19,"قم",),
-    (20,"کردستان",),
-    (21,"کرمان",),
-    (22,"کرمانشاه",),
-    (23,"کهگیلویه و بویراحمد",),
-    (24,"گلستان",),
-    (25,"لرستان",),
-    (26,"گیلان",),
-    (27,"مازندران",),
-    (28,"مرکزی",),
-    (29,"هرمزگان",),
-    (30,"همدان",),
-    (31,"یزد",)
-)
+from utils.cons import CITY_CHOICES
+
 
 def get_default_hotel_image_cover():
     return 'hotel-images/default_hotel_image.jpg'

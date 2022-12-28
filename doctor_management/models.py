@@ -5,7 +5,7 @@ from django.contrib.gis.db import models as lcmodels
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django_jalali.db import models as jmodels
-from rest_framework import serializers
+from utils.cons import CITY_CHOICES
 
 class Specialty(models.Model):
     name = models.CharField(max_length=250, unique=True, blank=False, null=False)
@@ -29,7 +29,7 @@ class Doctor(models.Model):
     gender = models.IntegerField(choices=GENDER_CHOICES, default=2)
     specialties = models.ManyToManyField(Specialty)
     province = models.CharField(max_length=50, blank=False, null=True)
-    city = models.CharField(max_length=50, blank=False, null=True)
+    city = models.IntegerField(choices=CITY_CHOICES, blank=False, null=True, default=0)
     clinic_address = models.CharField(max_length=250, blank=True, null=True)
     image = models.ImageField(upload_to='doctor-image', blank=True, null=True)
     phone_number = models.CharField(max_length=11, blank=False, null=True)

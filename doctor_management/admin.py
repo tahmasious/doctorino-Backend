@@ -3,7 +3,7 @@ from .models import Doctor, Specialty, WorkDayPeriod, Appointment, DoctorReview
 
 
 class DoctorAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'national_code', 'is_active', 'gender')
+    list_display = ('id', 'user', 'national_code', 'is_active', 'gender', 'city')
 admin.site.register(Doctor, DoctorAdmin)
 admin.site.register(Specialty)
 
