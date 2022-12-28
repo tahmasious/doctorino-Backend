@@ -71,7 +71,7 @@ class DoctorCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        specialty_list = validated_data.pop('specialties')
+        specialty_list = validated_data.pop('specialties').split()
 
         user_serialized = UserSerializer(data=user_data)
         user_serialized.is_valid(raise_exception=True)
@@ -81,7 +81,7 @@ class DoctorCreateSerializer(serializers.ModelSerializer):
 
         doctor = Doctor.objects.create(user=user, **validated_data)
         for spec in specialty_list:
-            doctor.specialties.add(spec)
+            doctor.specialties.add(int(spec))
         doctor.save()
         return doctor
 
