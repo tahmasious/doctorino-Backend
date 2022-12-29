@@ -53,6 +53,13 @@ class IsDoctorOrReadOnly(permissions.BasePermission):
         return obj.user == request.user
 
 
+class IsPatientOwnerOrReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return obj.user == request.user
+
+
 class HasHotelOwnerRole(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user.is_hotel_owner

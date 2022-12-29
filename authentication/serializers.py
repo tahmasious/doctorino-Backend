@@ -3,7 +3,17 @@ from pprint import pprint
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import User
+from .models import User, Patient
+
+
+class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
+    def __init__(self, method_name=None, **kwargs):
+        self.method_name = method_name
+        kwargs['source'] = '*'
+        super(serializers.SerializerMethodField, self).__init__(**kwargs)
+
+    def to_internal_value(self, data):
+        return {self.field_name: data}
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -57,3 +67,40 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("first_name", "last_name", "email", "birth_day")
+
+
+class PatientCreateSerializer(serializers.ModelSerializer):
+    user = ReadWriteSerializerMethodField()
+
+    class Meta:
+        model = Patient
+        fields = '__all__'
+
+
+    def get_user(self, obj):
+        user = obj.user
+        return UserListSerializer(user).data
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+
+        user_serialized = UserSerializer(data=user_data)
+        user_serialized.is_valid(raise_exception=True)
+        user = user_serialized.save()
+        user.save()
+
+        patient = Patient.objects.create(user=user, **validated_data)
+        patient.save()
+        return patient
+
+
+class PatientDetailSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Patient
+        fields = "__all__"
+
+    def get_user(self, obj):
+        user = obj.user
+        return UserListSerializer(user).data
