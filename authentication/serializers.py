@@ -2,7 +2,7 @@ from pprint import pprint
 
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
+from django_jalali.serializers.serializerfield import JDateField, JDateTimeField
 from .models import User, Patient
 
 
@@ -75,6 +75,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class PatientCreateSerializer(serializers.ModelSerializer):
     user = ReadWriteSerializerMethodField()
+    birth_day = JDateField()
 
     class Meta:
         model = Patient
@@ -100,6 +101,7 @@ class PatientCreateSerializer(serializers.ModelSerializer):
 
 class PatientDetailSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
+    birth_day = JDateField()
 
     class Meta:
         model = Patient

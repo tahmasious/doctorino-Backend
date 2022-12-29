@@ -20,6 +20,8 @@ class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
 
 
 class HotelOwnerSerializer(serializers.ModelSerializer):
+    birth_day = JDateField()
+
     class Meta:
         model = HotelOwner
         fields = "__all__"
@@ -27,6 +29,7 @@ class HotelOwnerSerializer(serializers.ModelSerializer):
 
 class HotelOwnerCreateSerializer(serializers.ModelSerializer):
     user = ReadWriteSerializerMethodField()
+    birth_day = JDateField()
 
     class Meta:
         model = HotelOwner
@@ -208,6 +211,7 @@ class RoomSerializer(serializers.ModelSerializer):
 
 class HotelOwnerUpdateRetrieveSerializer(serializers.ModelSerializer):
     user = ReadWriteSerializerMethodField()
+    birth_day = JDateField()
 
     class Meta:
         model = HotelOwner
