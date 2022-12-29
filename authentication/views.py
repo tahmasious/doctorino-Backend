@@ -5,9 +5,10 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from authentication.models import User, HotelOwner, Patient
 from hotel_management.models import Hotel
 from .serializers import UserSerializer, CustomTokenObtainPairSerializer, UserListSerializer, \
-    UserProfileSerializer, PatientCreateSerializer
+    UserProfileSerializer, PatientCreateSerializer, PatientDetailSerializer
 
 from utils.permissions import IsPatientOwnerOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 class UserCreationView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -21,14 +22,14 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 
 class PatientCreateView(generics.CreateAPIView):
-    queryset = Patient.objects.filter(is_active=True)
+    queryset = Patient.objects.all()
     serializer_class = PatientCreateSerializer
     authentication_classes = []
 
 
 class PatientRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Patient.objects.all()
-    serializer_class = DoctorDetailSerializer
+    serializer_class = PatientDetailSerializer
     permission_classes = []
 
     def get_permissions(self):  # list doesn't need authentication, others need

@@ -70,32 +70,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class PatientCreateSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Patient
-        fields = "__all__"
-
-    def get_user(self, obj):
-        user = obj.user
-        return UserListSerializer(user).data
-
-
-class DoctorCreateSerializer(serializers.ModelSerializer):
     user = ReadWriteSerializerMethodField()
 
     class Meta:
         model = Patient
-        fields = (
-            "id", 
-            "user", 
-            "code_melli", 
-            "gender", 
-            "province", 
-            "city",
-            "phone_number",
-            "birth_day"
-        )
+        fields = '__all__'
 
 
     def get_user(self, obj):
@@ -113,3 +92,15 @@ class DoctorCreateSerializer(serializers.ModelSerializer):
         patient = Patient.objects.create(user=user, **validated_data)
         patient.save()
         return patient
+
+
+class PatientDetailSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Patient
+        fields = "__all__"
+
+    def get_user(self, obj):
+        user = obj.user
+        return UserListSerializer(user).data

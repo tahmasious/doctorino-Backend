@@ -43,6 +43,12 @@ class HotelOwner(models.Model):
 
 
 class Patient(models.Model):
+    GENDER_CHOICES = (
+        (0, 'male'),
+        (1, 'female'),
+        (2, 'not specified'),
+    )
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='patient')
     gender = models.IntegerField(choices=GENDER_CHOICES, default=2)
     code_melli = models.CharField(max_length=10, unique=True, blank=False, null=True)
