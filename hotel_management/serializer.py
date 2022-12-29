@@ -1,7 +1,7 @@
 from pprint import pprint
 
 from rest_framework import serializers
-
+from django_jalali.serializers.serializerfield import JDateField, JDateTimeField
 from authentication.models import HotelOwner, User
 from authentication.serializers import UserSerializer, UserListSerializer
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview, HotelImage
@@ -226,6 +226,9 @@ class HotelOwnerUpdateRetrieveSerializer(serializers.ModelSerializer):
 
 
 class HotelReserveSerializer(serializers.ModelSerializer):
+    from_date = JDateField()
+    to_date = JDateField()
+
     class Meta:
         model = HotelReservation
         fields = "__all__"

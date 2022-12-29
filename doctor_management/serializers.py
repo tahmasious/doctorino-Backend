@@ -3,7 +3,7 @@ from rest_framework.response import Response
 import time
 from .models import Doctor, Specialty, WorkDayPeriod, Appointment, DoctorReview
 from authentication.serializers import UserSerializer, UserListSerializer, UserCommonInfoSerializer
-from authentication.models import User
+from django_jalali.serializers.serializerfield import JDateField, JDateTimeField
 
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
@@ -117,6 +117,8 @@ class WorkDayPeriodSerializer(serializers.ModelSerializer):
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
+    date_reserved = JDateField()
+
     class Meta:
         model = Appointment
         fields = "__all__"
