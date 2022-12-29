@@ -55,7 +55,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         elif self.user.is_hotel_owner:
             child_id = self.user.owner.id
         else:
-            child_id = self.user.id
+            child_id = self.user.patient.id
         data.update({'child-id' : child_id})
         data.update({'first-name' : self.user.first_name})
         data.update({'last-name' : self.user.last_name})
