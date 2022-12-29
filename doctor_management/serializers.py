@@ -152,6 +152,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
 class DetailedAppointmentSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
+    date_reserved = JDateField()
 
     class Meta:
         model = Appointment
