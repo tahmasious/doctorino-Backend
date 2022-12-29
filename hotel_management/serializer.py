@@ -289,6 +289,7 @@ class DetailedHotelReservationSerializer(serializers.ModelSerializer):
 class HotelSearchByLocationSerializer(serializers.Serializer):
     lat = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
     long = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
+    city = serializers.IntegerField(required=False)
 
 class HotelReviewSerializer(serializers.ModelSerializer):
     class Meta:

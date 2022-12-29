@@ -172,11 +172,16 @@ class HotelSearchByLocation(APIView):
         query = HotelSearchByLocationSerializer(data=request.data)
         query.is_valid(raise_exception=True)
         related_hotels = Hotel.objects.all()
+
         if 'lat' in query.data.keys() and 'long' in query.data.keys():
             lat = float(query.data['lat'])
             long = float(query.data['long'])
             related_hotels = related_hotels.filter(location__distance_lt=(Point(lat, long), Distance(m=5000)))
 
+        if 'city' in query.data.keys():
+            city = query.data['city']
+            related_hotels = related_hotels.filter(city=city)
+        
         serialized_hotels = HotelListSerializer(related_hotels, many=True)
         return Response(serialized_hotels.data)
 
