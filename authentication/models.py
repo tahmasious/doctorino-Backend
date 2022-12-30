@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django_jalali.db import models as jmodels
+from utils.cons import PROVINCE_CHOICES, CITY_CHOICES
+
 
 class User(AbstractUser):
     GENDER_CHOICES = (
@@ -54,5 +56,6 @@ class Patient(models.Model):
     code_melli = models.CharField(max_length=10, unique=True, blank=False, null=True)
     phone_number = models.CharField(max_length=11, blank=False, null=True)
     birth_day = jmodels.jDateField(blank=False, null=True)
-    province = models.CharField(max_length=50, blank=False, null=True)
-    city = models.IntegerField(max_length=50, blank=False, null=True)
+    city = models.IntegerField(choices=CITY_CHOICES, blank=False, null=True, default=0)
+    province = models.IntegerField(choices=PROVINCE_CHOICES, blank=False, null=True, default=0)
+    is_active = models.BooleanField(default=False)

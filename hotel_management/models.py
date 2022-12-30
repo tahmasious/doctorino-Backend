@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django_jalali.db import models as jmodels
 from django.contrib.gis.db import models as lcmodels
 from django.contrib.gis.geos import Point
-from utils.cons import CITY_CHOICES
+from utils.cons import PROVINCE_CHOICES, CITY_CHOICES
 
 
 def get_default_hotel_image_cover():
@@ -31,6 +31,7 @@ class Hotel(models.Model):
     is_active = models.BooleanField(default=False)
     features = models.ManyToManyField(Feature, related_name="features", blank=True, null=True)
     phone_number = models.CharField(max_length=11, blank=False, null=True)
+    province = models.IntegerField(choices=PROVINCE_CHOICES, blank=False, null=True, default=0)
     city = models.IntegerField(choices=CITY_CHOICES, blank=False, null=True, default=0)
     location = lcmodels.PointField(geography=True, default=Point(0.0, 0.0))
 
