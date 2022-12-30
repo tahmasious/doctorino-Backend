@@ -4,7 +4,7 @@ class IsAppointmentOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return obj.doctor.user == request.user
+        return obj.patient == request.user
 
 
 class IsWorkDayOwnerOrReadOnly(permissions.BasePermission):
@@ -25,7 +25,7 @@ class IsHotelReserveOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return obj.hotel_room.hotel.hotel_owner.user == request.user
+        return obj.customer == request.user
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -43,6 +43,7 @@ class IsHotelOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
+        print(f"{obj.hotel_owner.user} == {request.user}")
         return obj.hotel_owner.user == request.user
 
 
