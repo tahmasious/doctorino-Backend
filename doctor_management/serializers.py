@@ -27,7 +27,8 @@ class DoctorDetailSerializer(serializers.ModelSerializer):
     specialties = ReadWriteSerializerMethodField()
     work_periods = serializers.SerializerMethodField()
     rate = serializers.ReadOnlyField()
-    city = serializers.SerializerMethodField()
+    city = ReadWriteSerializerMethodField()
+    province = ReadWriteSerializerMethodField()
 
     class Meta:
         model = Doctor
@@ -47,6 +48,10 @@ class DoctorDetailSerializer(serializers.ModelSerializer):
 
     def get_city(self, obj):
         return obj.get_city_display()
+
+    def get_province(self, obj):
+        return obj.get_province_display()
+
 
 class DoctorCreateSerializer(serializers.ModelSerializer):
     user = ReadWriteSerializerMethodField()
@@ -91,6 +96,7 @@ class DoctorListSerializer(serializers.ModelSerializer):
     user = UserCommonInfoSerializer()
     rate = serializers.ReadOnlyField()
     city = serializers.SerializerMethodField()
+    province = serializers.SerializerMethodField()
 
     class Meta:
         model = Doctor
@@ -104,11 +110,14 @@ class DoctorListSerializer(serializers.ModelSerializer):
     def get_city(self, obj):
         return obj.get_city_display()
 
+    def get_province(self, obj):
+        return obj.get_province_display()
+
 class SearchByLocationSpecialtySerializer(serializers.Serializer):
     lat = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
     long = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
     specialties = serializers.ListSerializer(required=False, child=serializers.IntegerField(allow_null=False))
-    city = serializers.IntegerField(required=False)
+    province = serializers.IntegerField(required=False)
 
 class WorkDayPeriodSerializer(serializers.ModelSerializer):
     class Meta:

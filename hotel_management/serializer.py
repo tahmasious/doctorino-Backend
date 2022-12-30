@@ -57,6 +57,8 @@ class HotelDetailSerializer(serializers.ModelSerializer):
     rate = serializers.ReadOnlyField()
     features = ReadWriteSerializerMethodField()
     images = serializers.SerializerMethodField()
+    city = ReadWriteSerializerMethodField()
+    province = ReadWriteSerializerMethodField()
 
     class Meta:
         model = Hotel
@@ -79,13 +81,20 @@ class HotelDetailSerializer(serializers.ModelSerializer):
         images = HotelImage.objects.filter(hotel_id=obj.id)
         return  HotelImageSerializer(images, many=True).data
 
+    def get_city(self, obj):
+        return obj.get_city_display()
+
+    def get_province(self, obj):
+        return obj.get_province_display()
+
 class HotelCreateSerializer(serializers.ModelSerializer):
     hotel_owner = ReadWriteSerializerMethodField(required=False)
     user = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
-        fields = ("id", "hotel_owner", "cover_image", "user", "hotel_name", "hotel_stars", "address", "features")
+        fields = ("id", "hotel_owner", "cover_image", "user", "hotel_name", "hotel_stars", "address", "features", "city"
+                  ,"province")
 
     def get_hotel_owner(self, obj):
         hotel_owner = obj.hotel_owner
@@ -140,6 +149,8 @@ class FeatureSerializer(serializers.ModelSerializer):
 class HotelListSerializer(serializers.ModelSerializer):
     features = serializers.SerializerMethodField()
     rate = serializers.ReadOnlyField()
+    city = serializers.SerializerMethodField()
+    province = serializers.SerializerMethodField()
 
     class Meta:
         model = Hotel
@@ -150,6 +161,11 @@ class HotelListSerializer(serializers.ModelSerializer):
         serializer = FeatureSerializer(features, many=True)
         return serializer.data
 
+    def get_city(self, obj):
+        return obj.get_city_display()
+
+    def get_province(self, obj):
+        return obj.get_province_display()
 
 class HotelRoomImagesSerializer(serializers.ModelSerializer):
 
@@ -172,7 +188,6 @@ class HotelRoomImagesSerializer(serializers.ModelSerializer):
 
 
 class RoomSerializer(serializers.ModelSerializer):
-    images = ReadWriteSerializerMethodField()
 
     def validate(self, attrs):
         errs = dict()
@@ -183,29 +198,14 @@ class RoomSerializer(serializers.ModelSerializer):
         if errs:
             raise serializers.ValidationError(errs)
         return data
+
     class Meta:
         model = Room
         fields = ('id', 'hotel', 'quantity', 'bed_count', 'price_per_night', 'images', 'room_title')
 
-
-    def get_images(self, obj):
-        images = RoomImage.objects.filter(room=obj)
-        serialized_images = HotelRoomImagesSerializer(images, many=True)
-        return serialized_images.data
-
     def create(self, validated_data):
-        if "images" in validated_data:
-            images = validated_data.pop('images')
         new_room = Room.objects.create(**validated_data)
         new_room.save()
-
-        if "images" in validated_data :
-            for image in images:
-                RoomImage.objects.create(room=new_room,
-                                         image=image['image'],
-                                         is_thumbnail=image['is_thumbnail'],
-                                         is_cover=image['is_cover']).save()
-
         return new_room
 
 
@@ -293,7 +293,7 @@ class DetailedHotelReservationSerializer(serializers.ModelSerializer):
 class HotelSearchByLocationSerializer(serializers.Serializer):
     lat = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
     long = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
-    city = serializers.IntegerField(required=False)
+    province = serializers.IntegerField(required=False)
 
 class HotelReviewSerializer(serializers.ModelSerializer):
     class Meta:

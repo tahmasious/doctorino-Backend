@@ -77,9 +77,9 @@ class DoctorSearchByLocationSpecialty(APIView):
         if 'specialties' in serialized_input.data.keys():
             specialties = serialized_input.data['specialties']
             related_doctors = related_doctors.filter(specialties__in=specialties)
-        if 'city' in serialized_input.data.keys():
-            city = serialized_input.data['city']
-            related_doctors = related_doctors.filter(city=city)
+        if 'province' in serialized_input.data.keys():
+            province = serialized_input.data['province']
+            related_doctors = related_doctors.filter(province=province)
         serialized_doctors = DoctorListSerializer(related_doctors, many=True)
         return Response(serialized_doctors.data)
 

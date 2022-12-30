@@ -76,6 +76,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class PatientCreateSerializer(serializers.ModelSerializer):
     user = ReadWriteSerializerMethodField()
     birth_day = JDateField()
+    city = ReadWriteSerializerMethodField()
+    province = ReadWriteSerializerMethodField()
 
     class Meta:
         model = Patient
@@ -85,6 +87,12 @@ class PatientCreateSerializer(serializers.ModelSerializer):
     def get_user(self, obj):
         user = obj.user
         return UserListSerializer(user).data
+
+    def get_city(self, obj):
+        return obj.get_city_display()
+
+    def get_province(self, obj):
+        return obj.get_province_display()
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -102,6 +110,8 @@ class PatientCreateSerializer(serializers.ModelSerializer):
 class PatientDetailSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     birth_day = JDateField()
+    city = ReadWriteSerializerMethodField()
+    province = ReadWriteSerializerMethodField()
 
     class Meta:
         model = Patient
@@ -110,3 +120,9 @@ class PatientDetailSerializer(serializers.ModelSerializer):
     def get_user(self, obj):
         user = obj.user
         return UserListSerializer(user).data
+
+    def get_city(self, obj):
+        return obj.get_city_display()
+
+    def get_province(self, obj):
+        return obj.get_province_display()

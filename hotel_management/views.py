@@ -178,9 +178,9 @@ class HotelSearchByLocation(APIView):
             long = float(query.data['long'])
             related_hotels = related_hotels.filter(location__distance_lt=(Point(lat, long), Distance(m=5000)))
 
-        if 'city' in query.data.keys():
-            city = query.data['city']
-            related_hotels = related_hotels.filter(city=city)
+        if 'province' in query.data.keys():
+            province = query.data['province']
+            related_hotels = related_hotels.filter(province=province)
         
         serialized_hotels = HotelListSerializer(related_hotels, many=True)
         return Response(serialized_hotels.data)
