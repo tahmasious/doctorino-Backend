@@ -9,6 +9,6 @@ def update_patient_city(modeladmin, request, queryset):
     queryset.update(city=0,province=0)
 
 class PatientAdmin(admin.ModelAdmin):
-    #list_display = ('id', 'user', 'code_melli', 'phone_number','city','province')
+    list_display = ('id', 'user', 'code_melli', 'phone_number','city','province')
     actions = [update_patient_city]
 admin.site.register(Patient, PatientAdmin)

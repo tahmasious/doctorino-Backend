@@ -8,7 +8,7 @@ def update_hotel_city(modeladmin, request, queryset):
     queryset.update(city=0,province=0)
 
 class HotelAdmin(admin.ModelAdmin):
-    #list_display = ("hotel_owner", "trade_code", "hotel_name", "hotel_stars", "is_active", "city")
+    list_display = ("hotel_owner", "trade_code", "hotel_name", "hotel_stars", "is_active", "city")
     list_filter = ("hotel_owner", "hotel_name")
     actions = [update_hotel_city]
 
