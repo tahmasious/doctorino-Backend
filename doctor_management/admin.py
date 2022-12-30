@@ -2,8 +2,14 @@ from django.contrib import admin
 from .models import Doctor, Specialty, WorkDayPeriod, Appointment, DoctorReview
 
 
+@admin.action(description='update doctor city and province')
+def update_doctor_city(modeladmin, request, queryset):
+    queryset.update(city=0,province=0)
+
 class DoctorAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'national_code', 'is_active', 'gender', 'city')
+    actions = [update_doctor_city]
+
 admin.site.register(Doctor, DoctorAdmin)
 admin.site.register(Specialty)
 
