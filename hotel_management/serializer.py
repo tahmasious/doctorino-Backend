@@ -201,7 +201,7 @@ class RoomSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Room
-        fields = ('id', 'hotel', 'quantity', 'bed_count', 'price_per_night', 'images', 'room_title')
+        fields = ('id', 'hotel', 'quantity', 'bed_count', 'price_per_night', 'room_title')
 
     def create(self, validated_data):
         new_room = Room.objects.create(**validated_data)
