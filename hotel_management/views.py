@@ -12,8 +12,9 @@ from rest_framework.viewsets import ModelViewSet
 
 from authentication.models import HotelOwner, User
 from doctorino.pagination import StandardResultsSetPagination
-from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
-from hotel_management.models import HotelReview, HotelImage
+from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation, HotelReview, HotelImage
+from doctor_management .models import Appointment
+
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
     HotelReviewSerializer, HotelImageSerializer, \
@@ -244,4 +245,14 @@ class UserHotelReservations(generics.ListAPIView):
         result = []
         self.user = get_object_or_404(User, pk=self.kwargs['pk'])
         return HotelReservation.objects.filter(customer=self.user)
-        
+
+
+class SuggestHotelAcordingToDoctorLocView(APIView):
+    pagination_class = StandardResultsSetPagination
+    serializer_class = HotelListSerializer
+
+    def get_queryset(self):
+        appointment = get_object_or_404(Appointment, pk=self.kwargs['appointment_pk'])
+        doctor = get_object_or_404(Doctor, pk=appointment.pk)
+        province = doctor.province
+        return Hotel.objects.filter(province=province)

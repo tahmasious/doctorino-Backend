@@ -23,5 +23,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('authentication.urls')),
     path('api/doctor/', include('doctor_management.urls')),
-    path('api/hotel/', include('hotel_management.urls'))
+    path('api/hotel/', include('hotel_management.urls')),
+    path('api/fetch/', include('web.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
