@@ -75,9 +75,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class PatientCreateSerializer(serializers.ModelSerializer):
     user = ReadWriteSerializerMethodField()
-    birth_day = JDateField()
-    city = ReadWriteSerializerMethodField()
-    province = ReadWriteSerializerMethodField()
+    birth_day = JDateField(required=False)
+    city = ReadWriteSerializerMethodField(required=False)
+    province = ReadWriteSerializerMethodField(required=False)
 
     class Meta:
         model = Patient

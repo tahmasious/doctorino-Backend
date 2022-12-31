@@ -29,7 +29,7 @@ class HotelOwnerSerializer(serializers.ModelSerializer):
 
 class HotelOwnerCreateSerializer(serializers.ModelSerializer):
     user = ReadWriteSerializerMethodField()
-    birth_day = JDateField()
+    birth_day = JDateField(required=False)
 
     class Meta:
         model = HotelOwner
