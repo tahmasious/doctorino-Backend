@@ -12,13 +12,16 @@ from rest_framework.viewsets import ModelViewSet
 
 from authentication.models import HotelOwner, User
 from doctorino.pagination import StandardResultsSetPagination
-from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
-from hotel_management.models import HotelReview, HotelImage
+from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation, HotelReview, HotelImage
+from doctor_management .models import Appointment
+
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
     HotelReviewSerializer, HotelImageSerializer, \
     FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer, \
-    HotelReserveSerializer, DetailedHotelReservationSerializer, HotelSearchByLocationSerializer
+    HotelReserveSerializer, DetailedHotelReservationSerializer, HotelSearchByLocationSerializer, \
+    SuggestHotelAcordingToDoctorLocationSerializer
+
 from utils.permissions import IsHotelOwnerOrReadOnly, HasHotelOwnerRole, IsRoomOwnerOrReadOnly, IsOwnerOrReadOnly, \
     IsHotelReserveOwnerOrReadOnly
 
@@ -244,4 +247,16 @@ class UserHotelReservations(generics.ListAPIView):
         result = []
         self.user = get_object_or_404(User, pk=self.kwargs['pk'])
         return HotelReservation.objects.filter(customer=self.user)
-        
+
+
+class SuggestHotelAcordingToDoctorLocationView(APIView):
+    pagination_class = StandardResultsSetPagination
+    
+    def post(self, request, format=None):
+        query = SuggestHotelAcordingToDoctorLocationSerializer(data=request.data)
+        query.is_valid(raise_exception=True)
+        appointment = get_object_or_404(Appointment, pk=query.data['appointment'])
+        province = appointment.doctor.province
+        related_hotels = Hotel.objects.filter(province=province)
+        serialized_hotels = HotelListSerializer(related_hotels, many=True)
+        return Response(serialized_hotels.data)

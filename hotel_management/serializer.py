@@ -324,3 +324,7 @@ class HotelImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = HotelImage
         fields = "__all__"
+
+
+class SuggestHotelAcordingToDoctorLocationSerializer(serializers.Serializer):
+    appointment = serializers.IntegerField(required=True)
