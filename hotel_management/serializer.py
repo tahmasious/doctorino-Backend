@@ -87,6 +87,16 @@ class HotelDetailSerializer(serializers.ModelSerializer):
     def get_province(self, obj):
         return obj.get_province_display()
 
+    def update(self, instance, validated_data):
+        data = super(HotelDetailSerializer, self).update(instance, validated_data)
+        features = validated_data['features']
+        for feature in features:
+            if Feature.objects.filter(id=feature).exists():
+                instance.features.add(feature)
+        instance.save()
+        return instance
+
+
 class HotelCreateSerializer(serializers.ModelSerializer):
     hotel_owner = ReadWriteSerializerMethodField(required=False)
     user = serializers.SerializerMethodField()
@@ -94,7 +104,7 @@ class HotelCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hotel
         fields = ("id", "hotel_owner", "cover_image", "user", "hotel_name", "hotel_stars", "address", "features", "city"
-                  ,"province")
+                  ,"province", "phone_number")
 
     def get_hotel_owner(self, obj):
         hotel_owner = obj.hotel_owner
