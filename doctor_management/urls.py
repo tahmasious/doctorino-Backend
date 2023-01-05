@@ -6,7 +6,8 @@ from .views import (DoctorListView, DoctorCreateView,
                     DoctorRetrieveUpdateDestroyView, SpecialtyListView,
                     user_id_to_doctor_id, DoctorSearchByLocationSpecialty, WorkDayPeriodModelViewSet,
                     AppointmentModelViewSet, DoctorAllWorkDaysListView, DoctorAllAppointmentsInProfilePageListView,
-                    DetailedDoctorAllAppointmentsListView, DoctorReviewListCreateView, UserDoctorAppoinments)
+                    DetailedDoctorAllAppointmentsListView, DoctorReviewListCreateView, UserDoctorAppoinments,
+                    AvailableTimeBaseOnDoctorDate)
 
 
 app_name = 'doctor_management'
@@ -42,4 +43,6 @@ urlpatterns = [                                                           # perm
     path('<int:pk>/reviews/', DoctorReviewListCreateView.as_view()),  # list : all , create : logged in user only
     path('<int:pk>/user_appoinments/', UserDoctorAppoinments.as_view()),
 
+    # available time base on date on doctor id
+    path('times/', AvailableTimeBaseOnDoctorDate.as_view(),)
 ]

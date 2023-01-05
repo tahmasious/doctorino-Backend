@@ -137,11 +137,11 @@ class AppointmentSerializer(serializers.ModelSerializer):
         data = super(AppointmentSerializer, self).validate(attrs)
         if Appointment.objects.filter(                        # -------(-----2(pm)------)-------4(pm)------------
                 to_time__lte=data['to_time'],
-                to_time__gte=data['from_time'],
+                to_time__gt=data['from_time'],
                 date_reserved=data['date_reserved'],
                 doctor=data['doctor']).exists() or \
         Appointment.objects.filter(                           # --------------2(pm)------(-------4(pm)--------)----
-                from_time__lte=data['to_time'],
+                from_time__lt=data['to_time'],
                 from_time__gte=data['from_time'],
                 date_reserved=data['date_reserved'],
                 doctor=data['doctor']).exists() or \
@@ -175,3 +175,8 @@ class DoctorReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoctorReview
         fields = "__all__"
+
+
+class DoctorDateSerializerForAvailableTime(serializers.Serializer):
+    doctor = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.filter(is_active=True))
+    date = JDateField()

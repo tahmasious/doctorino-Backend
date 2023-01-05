@@ -1,4 +1,7 @@
+from datetime import datetime
+from jdatetime import datetime as jalali_datetime
 from decimal import Decimal
+import time as moment
 from rest_framework.exceptions import ValidationError
 from django.contrib.gis.measure import Distance
 from django.shortcuts import render
@@ -11,13 +14,13 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import (DoctorDetailSerializer, DoctorListSerializer,
                           DoctorCreateSerializer, SpecialtySerializer, SearchByLocationSpecialtySerializer,
                           WorkDayPeriodSerializer, AppointmentSerializer, DetailedAppointmentSerializer,
-                          DoctorReviewSerializer)
+                          DoctorReviewSerializer, DoctorDateSerializerForAvailableTime)
 from django.contrib.gis.geos import Point
 from utils.permissions import IsDoctorOrReadOnly, IsWorkDayOwnerOrReadOnly, IsAppointmentOwnerOrReadOnly
 from django.db import transaction
 from rest_framework.response import Response
 from doctorino.pagination import StandardResultsSetPagination
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 import json
 from django.shortcuts import get_object_or_404
 
@@ -177,4 +180,84 @@ class UserDoctorAppoinments(generics.ListAPIView):
     def get_queryset(self):
         self.user = get_object_or_404(User, pk=self.kwargs['pk'])
         return Appointment.objects.filter(patient=self.user)
-        
+
+
+class AvailableTimeBaseOnDoctorDate(APIView):
+
+    def count_digits(self, num):
+        count = 0
+        n = num
+        while (n > 0):
+            count = count + 1
+            n = n // 10
+        return count
+
+    def sum_with_hour_quarter(self, time):
+        timeList = [str(time), '0:15:00']
+        totalSecs = 0
+        for tm in timeList:
+            timeParts = [int(s) for s in tm.split(':')]
+            totalSecs += (timeParts[0] * 60 + timeParts[1]) * 60 + timeParts[2]
+        totalSecs, sec = divmod(totalSecs, 60)
+        hr, min = divmod(totalSecs, 60)
+        if self.count_digits(hr) == 1:
+            hr = f"0{hr}"
+        if self.count_digits(min) == 1:
+            min = f"0{min}"
+        if self.count_digits(sec) == 1:
+            hr = f"0{sec}"
+        return f"{hr}:{min}:{sec}"
+
+    def post(self, request, format=None):
+        input = DoctorDateSerializerForAvailableTime(data=request.data)
+        result = []
+        if input.is_valid(raise_exception=True):
+            doctor = Doctor.objects.get(id=input.data['doctor'])
+            time = jalali_datetime.strptime(input.data['date'], "%Y-%m-%d")
+            work_days = WorkDayPeriod.objects.filter(doctor=doctor, day=time.weekday()).order_by("from_time")
+            if not work_days.exists():
+                return Response({})
+            this_time_pointer = work_days[0].from_time
+            end_time_date_time = datetime.strptime(f"{input.data['date']} {work_days.last().to_time}", "%Y-%m-%d %H:%M:%S")
+            while(True):
+                is_available = True
+                this_time_end = self.sum_with_hour_quarter(this_time_pointer)
+                this_end_date_time = datetime.strptime(f"{input.data['date']} {this_time_end}", "%Y-%m-%d %H:%M:%S")
+                if this_end_date_time > end_time_date_time:
+                    break
+                if not WorkDayPeriod.objects.filter(
+                        from_time__lte=this_time_pointer,
+                        to_time__gte=this_time_end,
+                        day=time.weekday(),
+                        doctor=doctor).exists():
+                    is_available = False
+
+                if Appointment.objects.filter(
+                        to_time__lte=this_time_end,
+                        to_time__gt=this_time_pointer,
+                        date_reserved=time,
+                        doctor=doctor).exists() or \
+                        Appointment.objects.filter(
+                            from_time__lt=this_time_end,
+                            from_time__gte=this_time_pointer,
+                            date_reserved=time,
+                            doctor=doctor).exists() or \
+                        Appointment.objects.filter(
+                            from_time__lte=this_time_pointer,
+                            to_time__gte=this_time_end,
+                            date_reserved=time,
+                            doctor=doctor).exists():
+                    is_available = False
+                result.append({
+                    'from_time' : this_time_pointer,
+                    'to_time' : this_time_end,
+                    'is_available' : is_available
+                })
+                this_time_pointer = this_time_end
+        return Response(result)
+'''
+{
+    "date" : "1400-10-18",
+    "doctor" : 2
+}
+'''
