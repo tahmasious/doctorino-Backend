@@ -8,7 +8,7 @@ from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView
     HotelImageDestroyView, \
     HotelOwnerHotelsListView, HotelReservationModelViewSet, HotelAllReservationListView, \
     HotelSearchByLocation, HotelAvailableRooms, UserHotelReservations, \
-    SuggestHotelAcordingToDoctorLocView
+    SuggestHotelAcordingToDoctorLocationView
 
 from .converters import DateConverter
 
@@ -53,5 +53,5 @@ urlpatterns = [
 
     path('<int:pk>/user_reservations/', UserHotelReservations.as_view()),
 
-    path('suggest_hotel/<int:appointment_pk>/', SuggestHotelAcordingToDoctorLocView.as_view()),
+    path('suggest_hotel/', SuggestHotelAcordingToDoctorLocationView.as_view()),
 ]

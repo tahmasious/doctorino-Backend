@@ -19,7 +19,9 @@ from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, H
     HotelListSerializer, \
     HotelReviewSerializer, HotelImageSerializer, \
     FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer, \
-    HotelReserveSerializer, DetailedHotelReservationSerializer, HotelSearchByLocationSerializer
+    HotelReserveSerializer, DetailedHotelReservationSerializer, HotelSearchByLocationSerializer, \
+    SuggestHotelAcordingToDoctorLocationSerializer
+
 from utils.permissions import IsHotelOwnerOrReadOnly, HasHotelOwnerRole, IsRoomOwnerOrReadOnly, IsOwnerOrReadOnly, \
     IsHotelReserveOwnerOrReadOnly
 
@@ -247,12 +249,14 @@ class UserHotelReservations(generics.ListAPIView):
         return HotelReservation.objects.filter(customer=self.user)
 
 
-class SuggestHotelAcordingToDoctorLocView(APIView):
+class SuggestHotelAcordingToDoctorLocationView(APIView):
     pagination_class = StandardResultsSetPagination
-    serializer_class = HotelListSerializer
-
-    def get_queryset(self):
-        appointment = get_object_or_404(Appointment, pk=self.kwargs['appointment_pk'])
-        doctor = get_object_or_404(Doctor, pk=appointment.pk)
-        province = doctor.province
-        return Hotel.objects.filter(province=province)
+    
+    def post(self, request, format=None):
+        query = SuggestHotelAcordingToDoctorLocationSerializer(data=request.data)
+        query.is_valid(raise_exception=True)
+        appointment = get_object_or_404(Appointment, pk=query.data['appointment'])
+        province = appointment.doctor.province
+        related_hotels = Hotel.objects.filter(province=province)
+        serialized_hotels = HotelListSerializer(related_hotels, many=True)
+        return Response(serialized_hotels.data)
