@@ -103,8 +103,7 @@ class HotelCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Hotel
-        fields = ("id", "hotel_owner", "cover_image", "user", "hotel_name", "hotel_stars", "address", "features", "city"
-                  ,"province", "phone_number")
+        fields = "__all__"
 
     def get_hotel_owner(self, obj):
         hotel_owner = obj.hotel_owner
