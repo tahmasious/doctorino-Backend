@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import (DoctorDetailSerializer, DoctorListSerializer,
                           DoctorCreateSerializer, SpecialtySerializer, SearchByLocationSpecialtySerializer,
                           WorkDayPeriodSerializer, AppointmentSerializer, DetailedAppointmentSerializer,
-                          DoctorReviewSerializer, DoctorDateSerializerForAvailableTime,
+                          DoctorDateSerializerForAvailableTime,
                           DoctorCreateReviewSerializer, DoctorRetrieveUpdateReviewSerializer)
 from django.contrib.gis.geos import Point
 from utils.permissions import IsDoctorOrReadOnly, IsWorkDayOwnerOrReadOnly, IsAppointmentOwnerOrReadOnly
