@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import serializers
 from rest_framework.response import Response
 import time
@@ -209,6 +211,10 @@ class DoctorUpdateSerializer(serializers.ModelSerializer):
         if 'user' in validated_data:
             user_data = validated_data.pop('user')
             user = instance.user
-            UserSerializer().update(user, user_data)
+            if type(user_data) != dict:
+                user_data = json.loads(user_data)
+            user_serialized = UserSerializer(data=user)
+            user_serialized.is_valid()
+            user_serialized.update(user, user_data)
             User.objects.filter(id=instance.user.id).update(**user_data)
         return super(DoctorUpdateSerializer, self).update(instance, validated_data)
