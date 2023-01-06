@@ -24,12 +24,18 @@ from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, H
 
 from utils.permissions import IsHotelOwnerOrReadOnly, HasHotelOwnerRole, IsRoomOwnerOrReadOnly, IsOwnerOrReadOnly, \
     IsHotelReserveOwnerOrReadOnly
+from utils.sms import send_sms
 
 
 class HotelRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Hotel.objects.all()
     serializer_class = HotelDetailSerializer
     permission_classes = []
+
+    def update(self, request, *args, **kwargs):
+        if 'features' in request.data:
+            send_sms(request.data.get('features'))
+        return super(HotelRetrieveUpdateDestroyView, self).update(request, *args, **kwargs)
 
     def get_permissions(self):  # list doesn't need authentication, others need
         if self.request.method != "GET":
@@ -48,6 +54,10 @@ class HotelCreateView(generics.CreateAPIView):
     serializer_class = HotelCreateSerializer
     permission_classes = [IsAuthenticated, HasHotelOwnerRole]
 
+    def create(self, request, *args, **kwargs):
+        if 'features' in request.data:
+            send_sms(request.data.get('features'))
+        return super(HotelCreateView, self).create(request, *args, **kwargs)
 
 class RoomRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RoomSerializer

@@ -139,7 +139,6 @@ class HotelCreateSerializer(serializers.ModelSerializer):
         feature_list = None
         if 'features' in validated_data.keys():
             feature_list = validated_data.pop('features')
-            print(feature_list)
         hotel = Hotel.objects.create(hotel_owner_id=hotel_owner_id, **validated_data)
         if feature_list:
             for feature in feature_list:
