@@ -126,3 +126,9 @@ class PatientDetailSerializer(serializers.ModelSerializer):
 
     def get_province(self, obj):
         return obj.get_province_display()
+
+
+class UserSimpleInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name")

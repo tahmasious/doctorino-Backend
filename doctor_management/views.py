@@ -14,7 +14,8 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .serializers import (DoctorDetailSerializer, DoctorListSerializer,
                           DoctorCreateSerializer, SpecialtySerializer, SearchByLocationSpecialtySerializer,
                           WorkDayPeriodSerializer, AppointmentSerializer, DetailedAppointmentSerializer,
-                          DoctorReviewSerializer, DoctorDateSerializerForAvailableTime)
+                          DoctorReviewSerializer, DoctorDateSerializerForAvailableTime,
+                          DoctorCreateReviewSerializer, DoctorRetrieveUpdateReviewSerializer)
 from django.contrib.gis.geos import Point
 from utils.permissions import IsDoctorOrReadOnly, IsWorkDayOwnerOrReadOnly, IsAppointmentOwnerOrReadOnly
 from django.db import transaction
@@ -152,8 +153,21 @@ class DetailedDoctorAllAppointmentsListView(generics.ListAPIView):  # include pa
 
 
 class DoctorReviewListCreateView(generics.ListCreateAPIView):
-    serializer_class = DoctorReviewSerializer
+    serializer_class = []
     pagination_class = StandardResultsSetPagination
+
+
+    def list(self, *args, **kwargs):
+        self.serializer_class = DoctorRetrieveUpdateReviewSerializer
+        return viewsets.ModelViewSet.list(self, *args, **kwargs)
+    
+    def retrieve(self, *args, **kwargs):
+        self.serializer_class = DoctorRetrieveUpdateReviewSerializer
+        return viewsets.ModelViewSet.retrieve(self, *args, **kwargs)
+
+    def create(self, *args, **kwargs):
+        self.serializer_class = DoctorCreateReviewSerializer
+        return viewsets.ModelViewSet.create(self, *args, **kwargs)
 
     def get_permissions(self):
         if self.request.method != "GET":

@@ -2,7 +2,8 @@ from rest_framework import serializers
 from rest_framework.response import Response
 import time
 from .models import Doctor, Specialty, WorkDayPeriod, Appointment, DoctorReview
-from authentication.serializers import UserSerializer, UserListSerializer, UserCommonInfoSerializer
+from authentication.serializers import UserSerializer, UserListSerializer, UserCommonInfoSerializer, \
+    UserSimpleInfoSerializer
 from django_jalali.serializers.serializerfield import JDateField, JDateTimeField
 
 
@@ -171,7 +172,7 @@ class DetailedAppointmentSerializer(serializers.ModelSerializer):
         return UserListSerializer(obj.patient).data
 
 
-class DoctorReviewSerializer(serializers.ModelSerializer):
+class DoctorCreateReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoctorReview
         fields = "__all__"
@@ -180,3 +181,14 @@ class DoctorReviewSerializer(serializers.ModelSerializer):
 class DoctorDateSerializerForAvailableTime(serializers.Serializer):
     doctor = serializers.PrimaryKeyRelatedField(queryset=Doctor.objects.filter(is_active=True))
     date = JDateField()
+
+
+class DoctorRetrieveUpdateReviewSerializer(serializers.ModelSerializer):
+    voter = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DoctorReview
+        fields = "__all__"
+
+    def get_voter(self, obj):
+        return UserSimpleInfoSerializer(obj.voter).data
