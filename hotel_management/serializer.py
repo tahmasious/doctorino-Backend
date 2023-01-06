@@ -327,3 +327,24 @@ class HotelImageSerializer(serializers.ModelSerializer):
 
 class SuggestHotelAcordingToDoctorLocationSerializer(serializers.Serializer):
     appointment = serializers.IntegerField(required=True)
+
+
+class UpdateHotelFeaturesSerializer(serializers.Serializer):
+    features = serializers.CharField(max_length=256)
+    hotel_id = serializers.PrimaryKeyRelatedField(queryset=Hotel.objects.all())
+
+    def validate(self, attrs):
+        data = super(UpdateHotelFeaturesSerializer, self).validate(attrs)
+        errs = dict()
+        if data['features'] != '' :
+            features = list(map(int, data['features'].split(",")))
+            for feature in features:
+                if not Feature.objects.filter(id=feature).exists():
+                    errs['features'] = ['ایدی فیچر نا معتبر']
+                    break
+        if 'features' not in data.keys():
+            errs['features'] = ['this field is required !']
+
+        if errs:
+            raise serializers.ValidationError(errs)
+        return data

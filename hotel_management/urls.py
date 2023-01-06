@@ -3,12 +3,12 @@ from rest_framework import routers
 from rest_framework.routers import DefaultRouter
 
 from .views import HotelRetrieveUpdateDestroyView, RoomRetrieveUpdateDestroyView, RoomListCreateView, \
-    HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView, HotelOwnerUpdateView,\
+    HotelRoomsListView, HotelRoomImageCreateView, HotelCreateView, FeatureListView, HotelListView, HotelOwnerUpdateView, \
     HotelOwnerCreateView, HotelReviewListCreateView, HotelImageCreateView, \
     HotelImageDestroyView, \
     HotelOwnerHotelsListView, HotelReservationModelViewSet, HotelAllReservationListView, \
     HotelSearchByLocation, HotelAvailableRooms, UserHotelReservations, \
-    SuggestHotelAcordingToDoctorLocationView
+    SuggestHotelAcordingToDoctorLocationView, UpdateHotelFeaturesView
 
 from .converters import DateConverter
 
@@ -54,4 +54,5 @@ urlpatterns = [
     path('<int:pk>/user_reservations/', UserHotelReservations.as_view()),
 
     path('suggest_hotel/', SuggestHotelAcordingToDoctorLocationView.as_view()),
+    path('feature/update/', UpdateHotelFeaturesView.as_view())
 ]

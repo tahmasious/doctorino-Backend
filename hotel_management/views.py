@@ -20,7 +20,7 @@ from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, H
     HotelReviewSerializer, HotelImageSerializer, \
     FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer, \
     HotelReserveSerializer, DetailedHotelReservationSerializer, HotelSearchByLocationSerializer, \
-    SuggestHotelAcordingToDoctorLocationSerializer
+    SuggestHotelAcordingToDoctorLocationSerializer, UpdateHotelFeaturesSerializer
 
 from utils.permissions import IsHotelOwnerOrReadOnly, HasHotelOwnerRole, IsRoomOwnerOrReadOnly, IsOwnerOrReadOnly, \
     IsHotelReserveOwnerOrReadOnly
@@ -270,3 +270,20 @@ class SuggestHotelAcordingToDoctorLocationView(APIView):
         related_hotels = Hotel.objects.filter(province=province)
         serialized_hotels = HotelListSerializer(related_hotels, many=True)
         return Response(serialized_hotels.data)
+
+class UpdateHotelFeaturesView(APIView):
+
+    def post(self, request, format=None):
+        input = UpdateHotelFeaturesSerializer(data=request.data)
+        if input.is_valid(raise_exception=True):
+            features = list(map(int, input.data.get('features').split(",")))
+            id = input.data.get('hotel_id')
+            hotel = Hotel.objects.filter(id=id)
+            hotel = hotel.first()
+            hotel.features.clear()
+            for feature in features:
+                hotel.features.add(Feature.objects.get(id=feature))
+            serialized_hotel = HotelDetailSerializer(hotel)
+
+            return Response(serialized_hotel.data)
+        return ValidationError({'error' : 'bad request'})
