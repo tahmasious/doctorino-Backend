@@ -207,14 +207,14 @@ class DoctorUpdateSerializer(serializers.ModelSerializer):
     def get_user(self, obj):
         return UserListSerializer(obj.user).data
 
-    def update(self, instance: Doctor, validated_data):
-        if 'user' in validated_data:
-            user_data = validated_data.pop('user')
-            user = instance.user
-            if type(user_data) != dict:
-                user_data = json.loads(user_data)
-            user_serialized = UserSerializer(data=user)
-            user_serialized.is_valid()
-            user_serialized.update(user, user_data)
-            User.objects.filter(id=instance.user.id).update(**user_data)
-        return super(DoctorUpdateSerializer, self).update(instance, validated_data)
+    # def update(self, instance: Doctor, validated_data):
+    #     if 'user' in validated_data:
+    #         user_data = validated_data.pop('user')
+    #         user = instance.user
+    #         if type(user_data) != dict:
+    #             user_data = json.loads(user_data)
+    #         user_serialized = UserSerializer(data=user)
+    #         user_serialized.is_valid()
+    #         user_serialized.update(user, user_data)
+    #         User.objects.filter(id=instance.user.id).update(**user_data)
+    #     return super(DoctorUpdateSerializer, self).update(instance, validated_data)
