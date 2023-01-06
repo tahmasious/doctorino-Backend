@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from django_jalali.db import models as jmodels
 from utils.cons import PROVINCE_CHOICES, CITY_CHOICES
 
+def get_doctor_default_image():
+    return 'doctor-image/default_doctor_image.jpg'
 
 class Specialty(models.Model):
     name = models.CharField(max_length=250, unique=True, blank=False, null=False)
@@ -32,7 +34,7 @@ class Doctor(models.Model):
     city = models.IntegerField(choices=CITY_CHOICES, blank=False, null=True, default=0)
     province = models.IntegerField(choices=PROVINCE_CHOICES, blank=False, null=True, default=0)
     clinic_address = models.CharField(max_length=250, blank=True, null=True)
-    image = models.ImageField(upload_to='doctor-image', blank=True, null=True)
+    image = models.ImageField(upload_to='doctor-image', blank=True, null=True, default=get_doctor_default_image)
     phone_number = models.CharField(max_length=11, blank=False, null=True)
     office_number = models.CharField(max_length=11, blank=False, null=True)
     education = models.CharField(max_length=50, blank=False, null=True)
