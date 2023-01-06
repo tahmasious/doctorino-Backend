@@ -15,7 +15,8 @@ from .serializers import (DoctorDetailSerializer, DoctorListSerializer,
                           DoctorCreateSerializer, SpecialtySerializer, SearchByLocationSpecialtySerializer,
                           WorkDayPeriodSerializer, AppointmentSerializer, DetailedAppointmentSerializer,
                           DoctorDateSerializerForAvailableTime,
-                          DoctorCreateReviewSerializer, DoctorRetrieveUpdateReviewSerializer)
+                          DoctorCreateReviewSerializer, DoctorRetrieveUpdateReviewSerializer,
+                          DoctorUpdateSerializer)
 from django.contrib.gis.geos import Point
 from utils.permissions import IsDoctorOrReadOnly, IsWorkDayOwnerOrReadOnly, IsAppointmentOwnerOrReadOnly
 from django.db import transaction
@@ -40,13 +41,21 @@ class DoctorCreateView(generics.CreateAPIView):
 
 class DoctorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Doctor.objects.all()
-    serializer_class = DoctorDetailSerializer
     permission_classes = []
 
-    def get_permissions(self):  # list doesn't need authentication, others need
+    def get_permissions(self):  # retrieve doesn't need authentication, others need
         if self.request.method != "GET":
             return [IsAuthenticated(), IsDoctorOrReadOnly()]
         return []
+    
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return DoctorDetailSerializer
+        if self.request.method == 'PUT':
+            return DoctorUpdateSerializer
+        return DoctorDetailSerializer
+
 
 
 class SpecialtyListView(generics.ListAPIView):

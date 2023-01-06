@@ -128,6 +128,25 @@ class PatientDetailSerializer(serializers.ModelSerializer):
         return obj.get_province_display()
 
 
+class PatientUpdateSerializer(serializers.ModelSerializer):
+    user = ReadWriteSerializerMethodField()
+
+    class Meta:
+        model = Patient
+        fields = "__all__"
+
+    def get_user(self, obj):
+        return UserListSerializer(obj.user).data
+
+    def update(self, instance: Patient, validated_data):
+        if 'user' in validated_data:
+            user_data = validated_data.pop('user')
+            user = instance.user
+            UserSerializer().update(user, user_data)
+            User.objects.filter(id=instance.user.id).update(**user_data)
+        return super(PatientUpdateSerializer, self).update(instance, validated_data)
+
+
 class UserSimpleInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

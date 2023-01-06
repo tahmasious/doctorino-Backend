@@ -5,7 +5,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from authentication.models import User, HotelOwner, Patient
 from hotel_management.models import Hotel
 from .serializers import UserSerializer, CustomTokenObtainPairSerializer, UserListSerializer, \
-    UserProfileSerializer, PatientCreateSerializer, PatientDetailSerializer
+    UserProfileSerializer, PatientCreateSerializer, PatientDetailSerializer, \
+    PatientUpdateSerializer
 
 from utils.permissions import IsPatientOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -32,7 +33,14 @@ class PatientRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PatientDetailSerializer
     permission_classes = []
 
-    def get_permissions(self):  # list doesn't need authentication, others need
+    def get_permissions(self):  # retrieve doesn't need authentication, others need
         if self.request.method != "GET":
             return [IsAuthenticated(), IsPatientOwnerOrReadOnly()]
         return []
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return PatientDetailSerializer
+        if self.request.method == 'PUT':
+            return PatientUpdateSerializer
+        return DoctorDetailSerializer
