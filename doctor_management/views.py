@@ -157,12 +157,13 @@ class DoctorReviewListCreateView(generics.ListCreateAPIView):
         self.serializer_class = DoctorRetrieveUpdateReviewSerializer
         return viewsets.ModelViewSet.list(self, *args, **kwargs)
     
-    # def get_serializer_class(self):
-    #     if self.action == 'list':
-    #         return DoctorRetrieveUpdateReviewSerializer
-    #     if self.action == 'retrieve':
-    #         return DoctorRetrieveUpdateReviewSerializer
-    #     return DoctorCreateReviewSerializer
+    def retrieve(self, *args, **kwargs):
+        self.serializer_class = DoctorRetrieveUpdateReviewSerializer
+        return viewsets.ModelViewSet.retrieve(self, *args, **kwargs)
+
+    def create(self, *args, **kwargs):
+        self.serializer_class = DoctorCreateReviewSerializer
+        return viewsets.ModelViewSet.create(self, *args, **kwargs)
 
     def get_permissions(self):
         if self.request.method != "GET":
