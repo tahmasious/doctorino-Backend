@@ -42,7 +42,7 @@ class DoctorCreateView(generics.CreateAPIView):
 class DoctorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Doctor.objects.all()
     permission_classes = []
-    serializer_class = DoctorDetailSerializer
+    # serializer_class = DoctorDetailSerializer
 
     def get_permissions(self):  # retrieve doesn't need authentication, others need
         if self.request.method != "GET":
@@ -50,12 +50,12 @@ class DoctorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         return []
     
 
-    # def get_serializer_class(self):
-    #     if self.request.method == 'GET':
-    #         return DoctorDetailSerializer
-    #     if self.request.method == 'PUT':
-    #         return DoctorUpdateSerializer
-    #     return DoctorDetailSerializer
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return DoctorDetailSerializer
+        if self.request.method == 'PUT':
+            return DoctorUpdateSerializer
+        return DoctorDetailSerializer
 
 
 
