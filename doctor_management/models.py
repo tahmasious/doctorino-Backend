@@ -12,6 +12,7 @@ def get_doctor_default_image():
 
 class Specialty(models.Model):
     name = models.CharField(max_length=250, unique=True, blank=False, null=False)
+    image = models.ImageField(upload_to='specialties-image', blank=True, null=True)
 
     def __str__(self):
         return self.name
