@@ -3,7 +3,7 @@ import datetime
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import Distance
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -17,7 +17,7 @@ from doctor_management .models import Appointment
 
 from hotel_management.serializer import HotelCreateSerializer, RoomSerializer, HotelRoomImagesSerializer, \
     HotelListSerializer, \
-    HotelReviewSerializer, HotelImageSerializer, \
+    HotelReviewCreateSerializer, HotelReviewListRetrieveSerializer, HotelImageSerializer, \
     FeatureSerializer, HotelDetailSerializer, HotelOwnerUpdateRetrieveSerializer, HotelOwnerCreateSerializer, \
     HotelReserveSerializer, DetailedHotelReservationSerializer, HotelSearchByLocationSerializer, \
     SuggestHotelAcordingToDoctorLocationSerializer, UpdateHotelFeaturesSerializer
@@ -120,8 +120,17 @@ class HotelOwnerHotelsListView(generics.ListAPIView):
 
 
 class HotelReviewListCreateView(generics.ListCreateAPIView):
-    serializer_class = HotelReviewSerializer
+    serializer_class = []
     pagination_class = StandardResultsSetPagination
+
+    def list(self, *args, **kwargs):
+        self.serializer_class = HotelReviewListRetrieveSerializer
+        return viewsets.ModelViewSet.list(self, *args, **kwargs)
+
+    def create(self, *args, **kwargs):
+        self.serializer_class = HotelReviewCreateSerializer
+        return viewsets.ModelViewSet.create(self, *args, **kwargs)
+
 
     def get_permissions(self):
         if self.request.method != "GET":
@@ -134,7 +143,7 @@ class HotelReviewListCreateView(generics.ListCreateAPIView):
 
         if not Hotel.objects.filter(id=self.kwargs['pk']).exists():
             raise ValidationError({
-                "error": "دکتری با این آیدی به ثبت نرسیده."
+                "error": "هتلی با این آیدی به ثبت نرسیده است."
             })
         return HotelReview.objects.filter(hotel_id=self.kwargs['pk'])
 

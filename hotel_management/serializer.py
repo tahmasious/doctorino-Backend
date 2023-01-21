@@ -3,7 +3,7 @@ from pprint import pprint
 from rest_framework import serializers
 from django_jalali.serializers.serializerfield import JDateField, JDateTimeField
 from authentication.models import HotelOwner, User
-from authentication.serializers import UserSerializer, UserListSerializer
+from authentication.serializers import UserSerializer, UserListSerializer, UserSimpleInfoSerializer
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview, HotelImage
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
 import datetime
@@ -303,10 +303,21 @@ class HotelSearchByLocationSerializer(serializers.Serializer):
     long = serializers.DecimalField(required=False, max_digits=9, decimal_places=6)
     province = serializers.IntegerField(required=False)
 
-class HotelReviewSerializer(serializers.ModelSerializer):
+class HotelReviewCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = HotelReview
         fields = "__all__"
+
+
+class HotelReviewListRetrieveSerializer(serializers.ModelSerializer):
+    voter = serializers.SerializerMethodField()
+
+    class Meta:
+        model = HotelReview
+        fields = "__all__"
+
+    def get_voter(self, obj):
+        return UserSimpleInfoSerializer(obj.voter).data
 
 
 class HotelImageSerializer(serializers.ModelSerializer):
