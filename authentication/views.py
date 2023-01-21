@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.response import Response
 from authentication.models import User, HotelOwner, Patient, VerificationCode
+from doctor_management.serializers import DoctorDetailSerializer
 from hotel_management.models import Hotel
 from .serializers import UserSerializer, CustomTokenObtainPairSerializer, UserListSerializer, \
     UserProfileSerializer, PatientCreateSerializer, PatientDetailSerializer, \
