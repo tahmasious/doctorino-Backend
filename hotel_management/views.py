@@ -296,3 +296,19 @@ class UpdateHotelFeaturesView(APIView):
 
             return Response(serialized_hotel.data)
         return ValidationError({'error' : 'bad request'})
+
+
+class SpecificDateReservationOfHotel(generics.ListAPIView):
+    serializer_class = DetailedHotelReservationSerializer
+    pagination_class = StandardResultsSetPagination
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if not Hotel.objects.filter(id=self.kwargs['pk']).exists():
+            raise ValidationError({
+                "error": "هتلی با این آیدی به ثبت نرسیده."
+            })
+        year = self.kwargs['year']
+        month = self.kwargs['month']
+        day = self.kwargs['day']
+        return HotelReservation.objects.filter(hotel_room__hotel_id=self.kwargs['pk'], from_date=f"{year}-{month}-{day}")
