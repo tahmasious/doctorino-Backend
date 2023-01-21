@@ -59,3 +59,10 @@ class Patient(models.Model):
     city = models.IntegerField(choices=CITY_CHOICES, blank=False, null=True, default=0)
     province = models.IntegerField(choices=PROVINCE_CHOICES, blank=False, null=True, default=0)
     is_active = models.BooleanField(default=False)
+
+
+class VerificationCode(models.Model):
+    code = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_code')
+    creation_datetime = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
