@@ -3,7 +3,8 @@ from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
 
 from authentication.views import UserCreationView, CustomTokenObtainPairView, \
-    PatientCreateView, PatientRetrieveUpdateDestroyView, SendVerificationCode, VerifyVerificationCode, SetNewPassword
+    PatientCreateView, PatientRetrieveUpdateDestroyView, SendVerificationCode, VerifyVerificationCode, SetNewPassword, \
+    BaseUserNameUpdate
 
 from rest_framework.routers import DefaultRouter
 
@@ -16,5 +17,6 @@ urlpatterns = [
     path('patient/new/', PatientCreateView.as_view()),
     path('change-password/send-code/', SendVerificationCode.as_view()),
     path('change-password/verify/', VerifyVerificationCode.as_view()),
-    path('change-password/set-password/', SetNewPassword.as_view())
+    path('change-password/set-password/', SetNewPassword.as_view()),
+    path('base-user/name/', BaseUserNameUpdate.as_view())
 ]

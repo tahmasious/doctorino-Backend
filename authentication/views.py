@@ -128,3 +128,21 @@ class SetNewPassword(APIView):
                 return Response({'status': 'ok'}, status=status.HTTP_200_OK)
             return Response({'error': 'هیچ کاربری با این ایمیل ثبت نشده'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'error': 'bad parameters'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class BaseUserNameUpdate(APIView):
+    def put(self, request, format=None):
+        if 'id' in request.data:
+            user = User.objects.filter(id=request.data.get('id'))
+            if user.exists():
+                user = user.first()
+                if 'first-name' in request.data:
+                    first_name = request.data.get('first-name')
+                    user.first_name = first_name
+                if 'last-name' in request.data:
+                    last_name = request.data.get('last-name')
+                    user.last_name = last_name
+                user.save()
+                return Response({'status': 'ok'}, status=status.HTTP_200_OK)
+            return Response({'error': 'هیچ کاربری با این آیدی ثبت نشده'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'bad parameters'}, status=status.HTTP_400_BAD_REQUEST)
