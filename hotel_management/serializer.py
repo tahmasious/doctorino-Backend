@@ -2,8 +2,9 @@ from pprint import pprint
 
 from rest_framework import serializers
 from django_jalali.serializers.serializerfield import JDateField, JDateTimeField
-from authentication.models import HotelOwner, User
+from authentication.models import HotelOwner, User, Patient
 from authentication.serializers import UserSerializer, UserListSerializer, UserSimpleInfoSerializer
+from doctor_management.models import Doctor
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReview, HotelImage
 from hotel_management.models import Hotel, Room, RoomImage, Feature, HotelReservation
 import datetime
@@ -295,7 +296,27 @@ class DetailedHotelReservationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_customer(self, obj):
-        return UserListSerializer(obj.customer).data
+        base_user = obj.customer
+        if base_user.is_hotel_owner:
+            wo_obj = HotelOwner.objects.get(user_id=obj.customer.id)
+            phone_number = wo_obj.telephone_number
+            national_code = wo_obj.national_code
+            role = "hotel-owner"
+        elif base_user.is_doctor:
+            doctor = Doctor.objects.get(user_id=obj.customer.id)
+            phone_number = doctor.phone_number
+            national_code = doctor.national_code
+            role = "doctor"
+        else:
+            patient = Patient.objects.get(user_id=obj.customer.id)
+            phone_number = patient.phone_number
+            national_code = patient.code_melli
+            role = "patient"
+        result = UserListSerializer(obj.customer).data
+        result['role'] = role
+        result['phone-number'] = phone_number
+        result['national-code'] = national_code
+        return result
 
 
 class HotelSearchByLocationSerializer(serializers.Serializer):

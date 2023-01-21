@@ -3,7 +3,7 @@ from pprint import pprint
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django_jalali.serializers.serializerfield import JDateField, JDateTimeField
-from .models import User, Patient
+from .models import User, Patient, HotelOwner
 
 
 class ReadWriteSerializerMethodField(serializers.SerializerMethodField):
