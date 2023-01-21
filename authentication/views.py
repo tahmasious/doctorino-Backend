@@ -62,8 +62,8 @@ def get_random_string(length):
 
 class SendVerificationCode(APIView):
     def post(self, request, format=None):
-        if 'user-id' in request.data :
-            user = User.objects.filter(id=request.data.get('user-id'))
+        if 'email' in request.data :
+            user = User.objects.filter(email=request.data.get('email'))
             if user.exists():
                 user = user.first()
                 code = get_random_string(4)
@@ -82,14 +82,14 @@ class SendVerificationCode(APIView):
                 code_obj = VerificationCode.objects.create(code=code, user=user)
                 code_obj.save()
                 return Response({'status' : 'ok'}, status=status.HTTP_200_OK)
-            return Response({'error' : 'هیچ کاربری با این آیدی ثبت نشده'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error' : 'هیچ کاربری با این ایمیل ثبت نشده'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'error' : 'bad parameters'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyVerificationCode(APIView):
     def post(self, request, format=None):
-        if 'user-id' in request.data and 'code' in request.data:
-            user = User.objects.filter(id=request.data.get('user-id'))
+        if 'email' in request.data and 'code' in request.data:
+            user = User.objects.filter(email=request.data.get('email'))
             if user.exists():
                 if len(request.data.get('code')) != 4:
                     return Response({'error': 'کد تایید باید چهار رقمی باشد'}, status=status.HTTP_400_BAD_REQUEST)
@@ -105,14 +105,14 @@ class VerifyVerificationCode(APIView):
                     return Response({'error': 'کد نامعتبر است'}, status=status.HTTP_400_BAD_REQUEST)
                 code_objs.update(is_used=True)
                 return Response({'status' : 'ok'}, status=status.HTTP_200_OK)
-            return Response({'error' : 'هیچ کاربری با این آیدی ثبت نشده'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error' : 'هیچ کاربری با این ایمیل ثبت نشده'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'error' : 'bad parameters'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SetNewPassword(APIView):
     def post(self, request, format=None):
-        if 'user-id' in request.data and 'password' in request.data:
-            user = User.objects.filter(id=request.data.get('user-id'))
+        if 'email' in request.data and 'password' in request.data:
+            user = User.objects.filter(email=request.data.get('email'))
             if user.exists():
                 user = user.first()
                 now_time = datetime.datetime.now()
@@ -125,5 +125,5 @@ class SetNewPassword(APIView):
                 user.set_password(request.data.get('password'))
                 user.save()
                 return Response({'status': 'ok'}, status=status.HTTP_200_OK)
-            return Response({'error': 'هیچ کاربری با این آیدی ثبت نشده'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'هیچ کاربری با این ایمیل ثبت نشده'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'error': 'bad parameters'}, status=status.HTTP_400_BAD_REQUEST)
