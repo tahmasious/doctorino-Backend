@@ -198,7 +198,7 @@ class DoctorRetrieveUpdateReviewSerializer(serializers.ModelSerializer):
 
 
 class DoctorUpdateSerializer(serializers.ModelSerializer):
-    user = ReadWriteSerializerMethodField()
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Doctor
