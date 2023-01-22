@@ -299,7 +299,7 @@ class DetailedHotelReservationSerializer(serializers.ModelSerializer):
         base_user = obj.customer
         if base_user.is_hotel_owner:
             wo_obj = HotelOwner.objects.get(user_id=obj.customer.id)
-            phone_number = wo_obj.telephone_number
+            phone_number = wo_obj.first_phone_number
             national_code = wo_obj.national_code
             role = "hotel-owner"
         elif base_user.is_doctor:
