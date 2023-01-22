@@ -63,6 +63,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data.update({'child-id' : child_id})
         data.update({'first-name' : self.user.first_name})
         data.update({'last-name' : self.user.last_name})
+        data.update({'email' : self.user.email})
         # and everything else you want to send in the response
         return data
 
